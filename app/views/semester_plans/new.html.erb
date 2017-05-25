@@ -1,0 +1,33 @@
+<h1> 
+  Neuer Supportplan für das laufende Semester
+</h1>
+<%= form_for(:semester_plan, :url => {:controller => 'semester_plans', :action => 'create'}) do |f| %>
+  <div class="row">
+    <div class="col-md-4">
+      <p> 
+        Name:</br> 
+        <%= f.text_field :name, value: "Supportplan" %> 
+      </p>
+    </div>
+    <div class="col-md-4">
+      <p> 
+        Startdatum:</br> 
+        <%= f.text_field :start, class: 'datepicker' %> 
+      </p>
+    </div>
+    <div class="col-md-4">
+      <p> 
+        Enddatum:</br> 
+        <%= f.text_field :end, class: 'datepicker'  %> 
+      </p>
+    </div>
+
+  </div>
+  <%= f.submit :Hinzufügen, class:"btn btn-lg btn-primary"%>
+<% end %>
+
+
+
+
+
+

@@ -7,3 +7,6 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 User.create(email: "andschroeder@uos.de", is_admin: true)
+10.times do |n|
+  User.create(first_name: "Jack#{n}", email: "jack#{n}@uos.de")
+end

@@ -1,0 +1,39 @@
+<% @page_title = "UserAuth | Signup" %>
+<div class="Benutzer hinzufügen">
+  <h1>Benutzerverwaltung</h1>
+  <div class="row well"> 
+    <p>
+      Um einen Benutzer hinzuzufügen muss die Uni-Email-Adresse des Benutzers eingegeben werden. Dieser kann sich daraufhin mit seiner RZ-Kennung und dem zugehörigen Passwort anmelden. 
+    </p>
+  </div>
+  <div class="row well"> 
+    <div class="col-md-6">
+      <%= render 'form' %>
+    </div>
+    <% if @users.any? %>
+    <h3>
+      Benutzer:
+    </h3>
+      <div class="col-md-6">
+        <% @users.each do |user| %>
+          <div class="well"
+            <p>
+              <b> 
+                Name:
+              </b>
+              <%= "#{user.get_name}" %>
+            </p>
+            <p>
+              <b> 
+                Email:
+              </b>
+              <%= "#{user.email} " %>
+            </p>
+            <%= link_to "Nutzer löschen", user,  method: :delete, data: { confirm: "Soll dieser Benutzer wirklich entfernt werden?" } %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
+</div>

@@ -1,0 +1,103 @@
+<h1><%=@plan.name%></h1>
+<table class="table-hover table-bordered table">
+  <tr>
+    <th>
+      Angestellte
+    </th>
+    <th colspan=<%=@plan.time_slots.length%>>
+      Zeit
+    </th>
+  </tr>
+  <tr>
+    <th>
+    </th>
+    <% ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"].each do |day| %>
+      <th colspan=4>
+      <%= day %>
+      </th>
+    <% end %>
+  </tr>
+  <tr>
+    <th>
+    </th>  
+    <% 5.times do  %>
+      <% ["8:00", "10:00", "12:00", "14:00"].each do |time| %>
+        <th>
+          <%= time %>
+        </th>
+      <% end %>
+    <% end %>
+  </tr>
+<%= form_for("connections", :url => {:controller => 'semester_plans', :action => 'connect'}) do |f| %>
+
+  <% @users.each do |user| %>
+    <tr>
+      <td>
+        <%= "#{user.first_name} #{user.last_name}" %>
+      </td>
+        <%@plan.time_slots.each do |slot| %>
+          <% av = SemesterPlanConnection.find_it(user, slot).availability %>
+          <% if current_user == user %>
+            <% case av 
+                when 0
+                %> 
+                  <td class="av0">
+            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                  </td>
+                <%
+                when 1
+                %> 
+                  <td class=av1>
+            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                  </td>
+                <%
+                when 2
+                %> 
+                  <td class=av2>
+            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                  </td>
+                <%
+                when 3
+                %> 
+                  <td class=av3>
+            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                  </td>
+                <%
+                end%>
+
+          <% else %>
+            <% case av 
+                when 0
+                %> 
+                  <td class="av0">
+                  <p>
+                  <%= av %>
+                  </p>
+                  </td>
+                <%
+                when 1
+                %> 
+                  <td class=av1>
+                  <%= av %>
+                  </td>
+                <%
+                when 2
+                %> 
+                  <td class=av2>
+                  <%= av %>
+                  </td>
+                <%
+                when 3
+                %> 
+                  <td class=av3>
+                  <%= av %>
+                  </td>
+                <%
+                end%>
+          <% end %>
+        <% end %>
+    </tr>
+  <% end %>
+</table>
+  <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
+<% end %>

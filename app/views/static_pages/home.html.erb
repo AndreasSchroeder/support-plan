@@ -1,0 +1,11 @@
+<h1>Übersicht</h1>
+<% if is_admin? %>
+  <div class=row>
+    <div class=col-md-6>
+      <%= link_to "Semesterplan erstellen", new_semester_plan_path, class: "btn btn-lg btn-primary"%>
+    </div>
+    <div class=col-md-6>
+      <%= link_to "Semesterferienplan erstellen", new_semester_break_plan_path, class: "btn btn-lg btn-primary" %>
+    </div>
+  </div>
+<% end %>

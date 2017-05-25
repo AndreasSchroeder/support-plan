@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  day_slot: one
+  availability: 1
+
+two:
+  user: two
+  day_slot: two
+  availability: 1

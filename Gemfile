@@ -39,6 +39,8 @@ gem 'jbuilder', '~> 2.5'
 # Style gem from twitter
 gem 'bootstrap-sass', '3.3.6'
 
+gem 'bootstrap-datepicker-rails'
+
 # Nur 30 User pro seite
 gem 'will_paginate',           '3.1.0'
 gem 'bootstrap-will_paginate', '0.0.10'

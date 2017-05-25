@@ -16,9 +16,14 @@
                                 <li class="dropdown-submenu">
                                     <%= link_to "Benutzer", "#" %>
                                     <ul class="dropdown-menu">
-                                        <li><%= link_to "Benutzer anzeigen", "#" %></li>
-                                        <li><%= link_to "Inaktive Benutzer", "#" %></li>
-
+                                        <li><%= link_to "Benutzer verwalten", users_path %></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <%= link_to "Supportpläne", "#" %>
+                                    <ul class="dropdown-menu">
+                                        <li><%= link_to "Semesterplan erstellen", new_semester_plan_path %></li>
+                                        <li><%= link_to "Ferienplan erstellen", new_semester_break_plan_path %></li>
                                     </ul>
                                 </li>
 
@@ -27,7 +32,7 @@
                                 <li><%= link_to "Einstellungen", "#" %></li>
                                 <li><%= link_to "Hilfe", "#" %></li>
                                 <li class="divider"></li>
-                                <li><%= link_to "Ausloggen", "#" %></li>
+                                <li><%= link_to "Ausloggen", logout_path, method: "delete" %></li>
                             </ul>
                         </div>
                     </li>

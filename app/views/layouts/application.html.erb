@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>SupportPlan</title>
+
     <%= csrf_meta_tags %>
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
@@ -9,6 +10,18 @@
      <%= render 'layouts/shim' %>
   </head>
   <body>
+    <script type="text/javascript">
+  $(document).ready(function(){
+    $('.datepicker').datepicker({
+    format: "dd. mm. yyyy",
+    todayBtn: "linked",
+    daysOfWeekDisabled: "0,6",
+    daysOfWeekHighlighted: "1,2,3,4,5",
+    calendarWeeks: true,
+    autoclose: true
+});
+  });
+</script>
     <%= render 'layouts/header' %>
      <div class="container">
       <% flash.each do |message_type, message| %>
