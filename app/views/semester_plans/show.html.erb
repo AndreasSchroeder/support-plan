@@ -1,16 +1,18 @@
 <h1><%=@plan.name%></h1>
 <table class="table-hover table-bordered table">
   <tr>
-    <th>
+    <th rowspan="3">
       Angestellte
+    </th>
+    <th rowspan="3">
+      Stunden
     </th>
     <th colspan=<%=@plan.time_slots.length%>>
       Zeit
     </th>
   </tr>
   <tr>
-    <th>
-    </th>
+
     <% ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"].each do |day| %>
       <th colspan=4>
       <%= day %>
@@ -18,8 +20,7 @@
     <% end %>
   </tr>
   <tr>
-    <th>
-    </th>  
+
     <% 5.times do  %>
       <% ["8:00", "10:00", "12:00", "14:00"].each do |time| %>
         <th>
@@ -28,76 +29,118 @@
       <% end %>
     <% end %>
   </tr>
-<%= form_for("connections", :url => {:controller => 'semester_plans', :action => 'connect'}) do |f| %>
+<%= form_for("connections", :url => {:controller => 'semester_plans', :action => 'handle'}) do |f| %>
 
   <% @users.each do |user| %>
     <tr>
       <td>
         <%= "#{user.first_name} #{user.last_name}" %>
       </td>
-        <%@plan.time_slots.each do |slot| %>
+      <td>
+        <%= "#{user.hours}" %>
+      </td>
+        <%@plan.time_slots.each_with_index do |slot, index| %>
           <% av = SemesterPlanConnection.find_it(user, slot).availability %>
-          <% if current_user == user %>
-            <% case av 
-                when 0
-                %> 
-                  <td class="av0">
-            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                  </td>
-                <%
-                when 1
-                %> 
-                  <td class=av1>
-            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                  </td>
-                <%
-                when 2
-                %> 
-                  <td class=av2>
-            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                  </td>
-                <%
-                when 3
-                %> 
-                  <td class=av3>
-            <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                  </td>
-                <%
-                end%>
+          <% if index == SemesterPlanConnection.find_it(user, slot).typus %>
+            <% p #current_user.first_name %>
+            <% p user.first_name %>
+            <% if (current_user == user && @plan.free? || current_user.is_admin?)  %>
+              <% case av 
+                  when 0
+                  %> 
+                    <td class="av0">
+              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                    </td>
+                  <%
+                  when 1
+                  %> 
+                    <td class=av1>
+              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                    </td>
+                  <%
+                  when 2
+                  %> 
+                    <td class=av2>
+              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                    </td>
+                  <%
+                  when 3
+                  %> 
+                    <td class=av3>
+              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                    </td>
+                  <%
+                  end%>
 
-          <% else %>
-            <% case av 
-                when 0
-                %> 
-                  <td class="av0">
-                  <p>
-                  <%= av %>
-                  </p>
-                  </td>
-                <%
-                when 1
-                %> 
-                  <td class=av1>
-                  <%= av %>
-                  </td>
-                <%
-                when 2
-                %> 
-                  <td class=av2>
-                  <%= av %>
-                  </td>
-                <%
-                when 3
-                %> 
-                  <td class=av3>
-                  <%= av %>
-                  </td>
-                <%
-                end%>
+            <% else %>
+              <% case av 
+                  when 0
+                  %> 
+                    <td class="av0">
+                    <p>
+                    <%= av %>
+                    </p>
+                    </td>
+                  <%
+                  when 1
+                  %> 
+                    <td class=av1>
+                    <%= av %>
+                    </td>
+                  <%
+                  when 2
+                  %> 
+                    <td class=av2>
+                    <%= av %>
+                    </td>
+                  <%
+                  when 3
+                  %> 
+                    <td class=av3>
+                    <%= av %>
+                    </td>
+                  <%
+                  end%>
+            <% end %>
+          <%else %>
+            ERROR!!!!!!!!!!!!!!!!!!!!
           <% end %>
         <% end %>
     </tr>
   <% end %>
 </table>
-  <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
+  <% if current_user.planable %>
+    <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
+  <% end %>
+<% end %>
+
+<% if current_user.is_admin? %>
+  <div class ="row well" >
+    <% if !@plan.free? %>
+
+      <%= form_for("free", :url => {:controller => 'semester_plans', :action => 'handle'}) do |f| %>
+        <div class ="col-md-6" >
+          <p>
+            Emails an alle Angestellen versenen?:
+          </p>
+        <%= f.check_box "email" %>
+      </div>
+       <div class ="col-md-6" >
+        <%= f.submit "Plan freigeben", class:"btn btn-lg btn-success"%>
+       </div>
+      <% end %>
+    <% else %>
+      <%= form_for("optimisation", :url => {:controller => 'semester_plans', :action => 'handle'}) do |f| %>
+        <div class ="col-md-6" >
+          <p>
+            Option:
+          </p>
+          <%= f.collection_select "kind", @options, :first, :second %>  
+        </div>
+        <div class ="col-md-6" >
+          <%= f.submit "Plan erstellen", class:"btn btn-lg btn-success"%>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
 <% end %>

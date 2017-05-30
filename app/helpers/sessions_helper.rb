@@ -14,7 +14,7 @@ module SessionsHelper
                 log_in user
                 @current_user = user
             end
-        end
+        end 
     end
 
     def is_admin?

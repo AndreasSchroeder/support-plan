@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170525150827) do
+ActiveRecord::Schema.define(version: 20170530154528) do
 
   create_table "day_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.date     "start"
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20170525150827) do
     t.integer  "availability"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.integer  "typus"
     t.index ["day_slot_id"], name: "index_semester_break_plan_connections_on_day_slot_id", using: :btree
     t.index ["user_id"], name: "index_semester_break_plan_connections_on_user_id", using: :btree
   end
@@ -34,8 +35,10 @@ ActiveRecord::Schema.define(version: 20170525150827) do
     t.datetime "start"
     t.datetime "end"
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.boolean  "free",                     default: false
+    t.text     "solution",   limit: 65535
   end
 
   create_table "semester_plan_connections", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -44,6 +47,7 @@ ActiveRecord::Schema.define(version: 20170525150827) do
     t.integer  "availability"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.integer  "typus"
     t.index ["time_slot_id"], name: "index_semester_plan_connections_on_time_slot_id", using: :btree
     t.index ["user_id"], name: "index_semester_plan_connections_on_user_id", using: :btree
   end
@@ -52,8 +56,10 @@ ActiveRecord::Schema.define(version: 20170525150827) do
     t.datetime "start"
     t.datetime "end"
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.boolean  "free",                     default: false
+    t.text     "solution",   limit: 65535
   end
 
   create_table "time_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

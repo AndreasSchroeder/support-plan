@@ -1,0 +1,28 @@
+<h1><%=@plan.name%> zulässiger Plan</h1>
+<%= @solution.first %>
+<table class="table-hover table-bordered table">
+  <tr>
+    <th>
+      Tag
+    </th>    
+    <th>
+      Schicht
+    </th>
+    <th>
+      Supporter
+    </th>
+  </tr>
+  <% @solution.each do |s| %>
+  <tr>
+    <td>
+      <%= TimeSlot.get_day(s[:index].to_i) %>
+    </td>
+    <td>
+      <%= TimeSlot.get_time(s[:index].to_i) %>
+    </td>
+    <td>
+      <%= User.find(s[:user].to_i).get_name %>
+    </td>    
+  </tr>
+  <% end %>
+</table>

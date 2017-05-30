@@ -1,6 +1,7 @@
 <h1>Übersicht</h1>
+
 <% if is_admin? %>
-  <div class=row>
+  <div class="row well ">
     <div class=col-md-6>
       <%= link_to "Semesterplan erstellen", new_semester_plan_path, class: "btn btn-lg btn-primary"%>
     </div>
@@ -8,4 +9,23 @@
       <%= link_to "Semesterferienplan erstellen", new_semester_break_plan_path, class: "btn btn-lg btn-primary" %>
     </div>
   </div>
+  <div class="row well">
+    <% if @plans.any? %>
+      <div class="col-md-6 well">
+       <h3> 
+        Pläne
+      </h3>
+        <% @plans.each do |plan| %>
+          <div class="col-md-6 well">
+            <%= link_to "#{plan.name}" , semester_plan_path(plan.id) %>
+            <p>
+              Start: <%= plan.start %>
+              End: <%= plan.end %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
 <% end %>
