@@ -1,13 +1,15 @@
 class UsersController < ApplicationController
+    # filters
     before_action :logged_in_user, only: [:index, :edit, :update, :destroy]
     before_action :admin_user, only: [:index, :edit, :update, :destroy]
 
-
+  # lists all users
   def index
     @user = User.new
     @users = User.all
   end
 
+  # for fill userdata
   def create
     @users = User.all
     if (User.find_by(email: checks_email_alternativ(params[:user][:email].downcase))) == nil
@@ -24,6 +26,7 @@ class UsersController < ApplicationController
     redirect_to action: :index
   end
 
+  # action for deleting
   def destroy
     User.find(params[:id]).destroy
     flash[:success] = "Benutzer wurde gelöscht"
@@ -32,6 +35,7 @@ class UsersController < ApplicationController
 
   private
 
+  # whitelisteed params
   def question_params
     params.require(:user).permit(:email)
   end

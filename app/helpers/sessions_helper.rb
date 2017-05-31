@@ -14,9 +14,10 @@ module SessionsHelper
                 log_in user
                 @current_user = user
             end
-        end 
+        end
     end
 
+    # checks if user is admin
     def is_admin?
         if current_user == nil
             return false

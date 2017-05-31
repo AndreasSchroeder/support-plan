@@ -1,4 +1,8 @@
 <h1><%=@plan.name%></h1>
+<h1><%=@plan.get_user_priority%></h1>
+
+
+
 <table class="table-hover table-bordered table">
   <tr>
     <th rowspan="3">
@@ -45,27 +49,27 @@
             <% p #current_user.first_name %>
             <% p user.first_name %>
             <% if (current_user == user && @plan.free? || current_user.is_admin?)  %>
-              <% case av 
+              <% case av
                   when 0
-                  %> 
+                  %>
                     <td class="av0">
               <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
                     </td>
                   <%
                   when 1
-                  %> 
+                  %>
                     <td class=av1>
               <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
                     </td>
                   <%
                   when 2
-                  %> 
+                  %>
                     <td class=av2>
               <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
                     </td>
                   <%
                   when 3
-                  %> 
+                  %>
                     <td class=av3>
               <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
                     </td>
@@ -73,9 +77,9 @@
                   end%>
 
             <% else %>
-              <% case av 
+              <% case av
                   when 0
-                  %> 
+                  %>
                     <td class="av0">
                     <p>
                     <%= av %>
@@ -83,19 +87,19 @@
                     </td>
                   <%
                   when 1
-                  %> 
+                  %>
                     <td class=av1>
                     <%= av %>
                     </td>
                   <%
                   when 2
-                  %> 
+                  %>
                     <td class=av2>
                     <%= av %>
                     </td>
                   <%
                   when 3
-                  %> 
+                  %>
                     <td class=av3>
                     <%= av %>
                     </td>
@@ -135,7 +139,7 @@
           <p>
             Option:
           </p>
-          <%= f.collection_select "kind", @options, :first, :second %>  
+          <%= f.collection_select "kind", @options, :first, :second %>
         </div>
         <div class ="col-md-6" >
           <%= f.submit "Plan erstellen", class:"btn btn-lg btn-success"%>
