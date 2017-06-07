@@ -1,5 +1,5 @@
 <h1><%=@plan.name%> zulässiger Plan</h1>
-<%= @solution.first %>
+<%= @solution  %>
 <table class="table-hover table-bordered table">
   <tr>
     <th>
@@ -12,8 +12,12 @@
       Supporter
     </th>
     <th>
-      Stunden
+       Co-Supporter
     </th>
+    <th>
+      Supporter
+    </th>
+
   </tr>
   <% @solution.each do |s| %>
   <tr>
@@ -26,9 +30,11 @@
     <td>
       <%= User.find(s[:user].to_i).get_name %>
     </td>
-    <td>
-      <%= User.find(s[:user].to_i).get_shifts_round %>
+     <td>
     </td>
+     <td>
+    </td>
+
   </tr>
   <% end %>
 </table>

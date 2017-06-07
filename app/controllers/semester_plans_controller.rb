@@ -59,6 +59,7 @@ class SemesterPlansController < ApplicationController
     # for user input
     if params["connections"]
       connect(params)
+       redirect_to action: "show"
     # starts optimization of plan or creats at least valid plan if possible
     elsif params["optimisation"]
       optimize(params)
@@ -66,8 +67,9 @@ class SemesterPlansController < ApplicationController
     elsif params["free"]
       flash[:success] = "Plan zur Bearbeitung freigegeben"
       SemesterPlan.find(params[:id]).update(free: true)
+       redirect_to action: "show"
     end
-    redirect_to action: "show"
+
 
   end
 
@@ -99,8 +101,8 @@ class SemesterPlansController < ApplicationController
     case params["optimisation"]["kind"]
       when "0"
           flash[:success] = " 0 verlinkt!"
-          p "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-          p valid_solution2
+          valid_solution2
+          redirect_to valid_path User.find(params[:id])
       when "1"
           flash[:success] = " 1 verlinkt!"
       when "2"
@@ -146,31 +148,66 @@ class SemesterPlansController < ApplicationController
   end
 
 
-
+  # calculates a valid solution
   def valid_solution2
+    # Randomgenerator
     rnd = Random.new
+
+    # current plan to slove
     plan = SemesterPlan.find(params[:id])
 
+    # prioritys for slots and user
+    # sorts slots by user availability
+    # sorts user by slot availibiluity
+    slot_priority_origin = plan.get_slot_priority
+    user_priority_origin = plan.get_user_priority
+
+
+    # empty slots to empty solution_slots at each itteration begin
     empty_slots = []
     20.times do |n|
-      empty_slots << {index: n, user: nil}
+      empty_slots << {index: n, user: nil, co: nil}
     end
+
+    # break variable
     done = false
+
+    # availabilty which will be max accepted
     availability = 1
+
+    # saves itterations
     i = 0
+
+    # iteration border for availibility to increase to 2
     i_av_2 = 400
+
+    # iteration_border for interrupt
     i_max = 800
+
+    # saves the solution
     solution_slots = []
 
+    # until all slots are valid taken
+    start = Time.now
     begin
+      # counter for open slots
       slots = 20
+
+      # clear solution
       solution_slots = empty_slots.clone
-      slot_priority = plan.get_slot_priority
-      user_priority = plan.get_user_priority
+
+      # clone prioritys and shift-plans
+      slot_priority = slot_priority_origin.clone
+      user_priority = user_priority_origin.clone
       shifts = User.supporter_amount_of_shifts
+
+      # set break variable to false
       done = false
+
+      # repeat until plan invalid or complete plan valid
       while slot_priority.length != 0 && !done
 
+        # random wheel for all slot prioritys
         roulette = []
         sum = slot_priority.inject(0) {|s, pri|
           s += pri[:priority]
@@ -180,10 +217,12 @@ class SemesterPlansController < ApplicationController
           kumul += (pri[:priority].to_f / sum.to_f).to_f
           roulette << {index: index, value: kumul}
         end
-        p roulette
+
+        # random float
         random = rnd.rand
-        p random
         slot = nil
+
+        # take random slot
         roulette.each do |roul|
           if roul[:value] > random
             slot = slot_priority[roul[:index]]
@@ -191,22 +230,41 @@ class SemesterPlansController < ApplicationController
           end
         end
 
-
-
+        # saves the found user
         found_user = nil
+
+        # return all user with given availbility in current slot
         users = TimeSlot.find(slot[:slot]).get_users availability
+
+        # if at least 1 user found
         if users.length != 0
+
+          # break conditions
           found = false
           nothing = true
+
+          # tests all slots
           user_priority.each do |pr_user|
             if !found
+
+              # tests all available users
               users.each do |slot_user|
+
+                # if user is found and in earlier iterations no user was found for this slot
                 if pr_user[:user] == slot_user && !found
+
+                  # saves user for slot
                   solution_slots.detect {|s| s[:index] == slot[:index]}[:user] = slot_user
+
+                  # set
                   found = true
                   found_user = pr_user
 
+                  # update shifts
                   shifts = User.reduce_shifts found_user[:user], shifts
+
+                  # remove user from slot_priority and delete user from user_priority
+                  #  if all shifts are given
                   shifts.each do |s|
                     if s[:user] == found_user[:user]
                       if s[:shifts] == 0
@@ -216,14 +274,19 @@ class SemesterPlansController < ApplicationController
                     end
                   end
 
+                  # delete slot and sort
                   slot_priority.delete(slot)
                   slot_priority.sort_by! {|item|
                     item[:priority] * -1
                   }
+
+                  # removes slot from user_priority and sort
                   user_priority = SemesterPlan.kill_slot_in_user_priority slot[:slot], user_priority
                   user_priority.sort_by! {|item|
                     item[:priority] * -1
                   }
+
+                  # decrement slots and set nothing to false for next iteration
                   slots -= 1
                   nothing = false
                   break
@@ -231,20 +294,32 @@ class SemesterPlansController < ApplicationController
               end
             end
           end
+
+          # break if no slot was found
           if nothing == true
             done = true
           end
+        # break if no user was found
         else
           done = true
         end
       end
-      if i > i_max
+      p "TIME"
+      p Time.now - start
+      # break if iteration max is reached
+      if Time.now - start > 10
         done = true
-      elsif i >i_av_2
+
+      # increment aǘailbility
+      elsif Time.now - start > 5
         availability = 2
       end
+
+      # increment iteration
       i += 1
     end while  slots > 0
+
+    # update solution and return it additionally (r)
     plan.update(solution: "#{solution_slots}")
     solution_slots
 

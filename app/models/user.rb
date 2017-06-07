@@ -47,6 +47,7 @@ class User < ApplicationRecord
 
   # returns hash with amount of shifts per supporter
   def self.supporter_amount_of_shifts
+    rnd = Random.new
     # initialize and fill
     shifts = []
     User.where(planable: true).each do |user|
@@ -58,14 +59,14 @@ class User < ApplicationRecord
     # flatten hash, so sum is 20
     while sum > 20
       shifts.sort_by! { |item|
-        [item[:shifts]* -1 , User.find(item[:user]).hours ]
+        [item[:shifts]* -1 , User.find(item[:user]).hours, rnd.rand ]
       }
       shifts[0][:shifts] -= 1
       sum -=1
     end
     while sum < 20
       shifts.sort_by! { |item|
-        [item[:shifts] , User.find(item[:user]).hours * -1]
+        [item[:shifts] , User.find(item[:user]).hours * -1, rnd.rand]
       }
       shifts[0][:shifts] += 1
       sum +=1
@@ -77,8 +78,9 @@ class User < ApplicationRecord
 
   def self.reduce_shifts user, shifts
     shifts.each do |s|
-      if s[:user] == user
+      if s[:user] == user && s[:shifts] != 0
         s[:shifts] -= 1
+
       end
     end
     shifts
