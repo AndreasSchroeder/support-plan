@@ -208,15 +208,8 @@ class SemesterPlansController < ApplicationController
       while slot_priority.length != 0 && !done
 
         # random wheel for all slot prioritys
-        roulette = []
-        sum = slot_priority.inject(0) {|s, pri|
-          s += pri[:priority]
-        }
-        kumul = 0.0
-        slot_priority.each_with_index do |pri, index|
-          kumul += (pri[:priority].to_f / sum.to_f).to_f
-          roulette << {index: index, value: kumul}
-        end
+        roulette = calc_roulette slot_priority
+
 
         # random float
         random = rnd.rand
@@ -279,7 +272,7 @@ class SemesterPlansController < ApplicationController
                   slot_priority.sort_by! {|item|
                     item[:priority] * -1
                   }
-
+                  p slot_priority
                   # removes slot from user_priority and sort
                   user_priority = SemesterPlan.kill_slot_in_user_priority slot[:slot], user_priority
                   user_priority.sort_by! {|item|
@@ -304,14 +297,12 @@ class SemesterPlansController < ApplicationController
           done = true
         end
       end
-      p "TIME"
-      p Time.now - start
       # break if iteration max is reached
-      if Time.now - start > 10
+      if Time.now - start > 20
         done = true
 
       # increment aǘailbility
-      elsif Time.now - start > 5
+      elsif Time.now - start > 10
         availability = 2
       end
 
@@ -323,6 +314,23 @@ class SemesterPlansController < ApplicationController
     plan.update(solution: "#{solution_slots}")
     solution_slots
 
+  end
+
+  def calc_roulette pri_slot
+    roulette = []
+    size = pri_slot.length.to_f
+    sum = pri_slot.inject(0) {|s, pri|
+      s += pri[:priority].to_f * ((size/pri_slot.length.to_f)+1.0)
+      size -= 1
+      s
+    }
+    kumul = 0.0
+    pri_slot.each_with_index do  |pri, index|
+      size = pri_slot.length.to_f() - index.to_f
+      kumul += (pri[:priority].to_f * ((size/pri_slot.length.to_f)+1.0))/ sum.to_f
+      roulette << {index: index, value: kumul}
+    end
+    roulette
   end
 
   #calculates a valid solution

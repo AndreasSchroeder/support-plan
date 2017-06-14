@@ -27,12 +27,14 @@
     <td>
       <%= TimeSlot.get_time(s[:index].to_i) %>
     </td>
-    <td>
+    <td  class=<%="av#{SemesterPlanConnection.find_it_id(s[:user].to_i, (s[:index].to_i() +1)).availability}" %>>
       <%= User.find(s[:user].to_i).get_name %>
     </td>
      <td>
+     <%= s[:index] %>
     </td>
      <td>
+     <%= s[:user] %>
     </td>
 
   </tr>

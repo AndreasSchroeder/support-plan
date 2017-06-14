@@ -18,6 +18,9 @@ class SemesterPlan < ApplicationRecord
   def self.kill_user_in_slot_priority user, slots
     slots.each do |slot|
       slot[:priority] -= SemesterPlan.slot_user_value(slot[:slot], user)
+      if slot[:priority] < 0
+        slot[:priority] = 0
+      end
     end
     slots
   end
@@ -25,6 +28,9 @@ class SemesterPlan < ApplicationRecord
   def self.kill_slot_in_user_priority slot, users
     users.each do |user|
       user[:priority] -= SemesterPlan.slot_user_value slot, user[:user]
+      if user[:priority] < 0
+        user[:priority] =0
+      end
     end
     users
   end
@@ -61,5 +67,6 @@ class SemesterPlan < ApplicationRecord
     }
     priority
   end
+
 
 end

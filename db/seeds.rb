@@ -58,7 +58,7 @@ end
     type = time_mult + 4 * day_mult
     av = 0
     if found
-      @slots << SemesterPlanConnection.create(user: user, time_slot: slot, typus: type, availability: ran.rand(1..3))
+      @slots << SemesterPlanConnection.create(user: user, time_slot: slot, typus: type, availability: (ran.rand(0..2)%3)+1)
     else
       @slots << SemesterPlanConnection.find_it(user, slot)
     end
