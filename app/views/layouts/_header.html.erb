@@ -20,7 +20,7 @@
                                     </ul>
                                 </li>
                                 <li class="dropdown-submenu">
-                                    <%= link_to "Supportpläne", "#" %>
+                                    <%= link_to "Supportpläne", root_path %>
                                     <ul class="dropdown-menu">
                                         <li><%= link_to "Semesterplan erstellen", new_semester_plan_path %></li>
                                         <li><%= link_to "Ferienplan erstellen", new_semester_break_plan_path %></li>
@@ -29,6 +29,7 @@
 
 
                                 <li class="divider"></li>
+                                <li><%= link_to "Start", root_path %></li>
                                 <li><%= link_to "Einstellungen", "#" %></li>
                                 <li><%= link_to "Hilfe", "#" %></li>
                                 <li class="divider"></li>

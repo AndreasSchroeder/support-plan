@@ -172,7 +172,7 @@ class SemesterPlansController < ApplicationController
       empty_slots = eval(plan.solution)
     else
       20.times do |n|
-        empty_slots << {index: n, user: nil, co: nil}
+        empty_slots << {index: n, user: nil, co: nil, slot: nil}
       end
     end
 
@@ -233,6 +233,7 @@ class SemesterPlansController < ApplicationController
             break
           end
         end
+        p "DER SLOT: #{slot}"
 
         # saves the found user
         found_user = nil
@@ -263,8 +264,10 @@ class SemesterPlansController < ApplicationController
                      # saves user for slot
                     if co_support
                       solution_slots.detect {|s| s[:index] == slot[:index]}[:co] = slot_user
+                      solution_slots.detect {|s| s[:index] == slot[:index]}[:slot] = slot[:slot]
                     else
                       solution_slots.detect {|s| s[:index] == slot[:index]}[:user] = slot_user
+                      solution_slots.detect {|s| s[:index] == slot[:index]}[:slot] = slot[:slot]
                     end
 
 
@@ -359,7 +362,7 @@ class SemesterPlansController < ApplicationController
       else
         kumul += (pri[:priority].to_f * ((size/pri_slot.length.to_f)+1.0))/ sum.to_f
       end
-      roulette << {index: index, value: kumul}
+      roulette << {index: index, value: kumul, slot: pri[:slot]}
       size -= 1
     end
     #p roulette
