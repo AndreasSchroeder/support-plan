@@ -1,5 +1,4 @@
 <h1><%=@plan.name%></h1>
-<h1><%=@plan.get_slot_priority%></h1>
 
 
 
@@ -46,8 +45,7 @@
         <%@plan.time_slots.each_with_index do |slot, index| %>
           <% av = SemesterPlanConnection.find_it(user, slot).availability %>
           <% if index == SemesterPlanConnection.find_it(user, slot).typus %>
-            <% p #current_user.first_name %>
-            <% p user.first_name %>
+
             <% if (current_user == user && @plan.free? || current_user.is_admin?)  %>
               <% case av
                   when 0
@@ -113,7 +111,7 @@
     </tr>
   <% end %>
 </table>
-  <% if current_user.planable %>
+  <% if current_user.planable || current_user.is_admin? %>
     <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
   <% end %>
 <% end %>

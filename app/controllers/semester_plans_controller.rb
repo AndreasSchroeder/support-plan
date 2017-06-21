@@ -100,8 +100,11 @@ class SemesterPlansController < ApplicationController
   def optimize(params)
     case params["optimisation"]["kind"]
       when "0"
-          flash[:success] = " 0 verlinkt!"
-          valid_solution2
+          flash[:success] = " Gültiger Plan wurde erstellt."
+          valid_solution2 false
+          if feasible SemesterPlan.find(params[:id]).solution
+            valid_solution2 true
+          end
           redirect_to valid_path User.find(params[:id])
       when "1"
           flash[:success] = " 1 verlinkt!"
@@ -149,7 +152,7 @@ class SemesterPlansController < ApplicationController
 
 
   # calculates a valid solution
-  def valid_solution2
+  def valid_solution2 co_support
     # Randomgenerator
     rnd = Random.new
 
@@ -165,15 +168,23 @@ class SemesterPlansController < ApplicationController
 
     # empty slots to empty solution_slots at each itteration begin
     empty_slots = []
-    20.times do |n|
-      empty_slots << {index: n, user: nil, co: nil}
+    if co_support
+      empty_slots = eval(plan.solution)
+    else
+      20.times do |n|
+        empty_slots << {index: n, user: nil, co: nil}
+      end
     end
 
     # break variable
     done = false
 
     # availabilty which will be max accepted
-    availability = 1
+    if co_support
+      availability = 2
+    else
+      availability = 1
+    end
 
     # saves itterations
     i = 0
@@ -225,7 +236,7 @@ class SemesterPlansController < ApplicationController
 
         # saves the found user
         found_user = nil
-
+        #p slot[:slot]
         # return all user with given availbility in current slot
         users = TimeSlot.find(slot[:slot]).get_users availability
 
@@ -244,10 +255,19 @@ class SemesterPlansController < ApplicationController
               users.each do |slot_user|
 
                 # if user is found and in earlier iterations no user was found for this slot
-                if pr_user[:user] == slot_user && !found
+                if (pr_user[:user] == slot_user && !found) &&(co_support && solution_slots.detect {|s| s[:index] == slot[:index]}[:user] !=slot_user || !co_support)
 
-                  # saves user for slot
-                  solution_slots.detect {|s| s[:index] == slot[:index]}[:user] = slot_user
+                  #p "slot: #{slot} #{slot_user} "
+                  #p "user: #{}"
+
+                     # saves user for slot
+                    if co_support
+                      solution_slots.detect {|s| s[:index] == slot[:index]}[:co] = slot_user
+                    else
+                      solution_slots.detect {|s| s[:index] == slot[:index]}[:user] = slot_user
+                    end
+
+
 
                   # set
                   found = true
@@ -272,7 +292,7 @@ class SemesterPlansController < ApplicationController
                   slot_priority.sort_by! {|item|
                     item[:priority] * -1
                   }
-                  p slot_priority
+                  #p "slot pri #{slot_priority}"
                   # removes slot from user_priority and sort
                   user_priority = SemesterPlan.kill_slot_in_user_priority slot[:slot], user_priority
                   user_priority.sort_by! {|item|
@@ -298,17 +318,22 @@ class SemesterPlansController < ApplicationController
         end
       end
       # break if iteration max is reached
-      if Time.now - start > 20
+      if Time.now - start > 10
         done = true
 
       # increment aǘailbility
-      elsif Time.now - start > 10
-        availability = 2
+      elsif Time.now - start > 2
+        if availability != 2
+          availability = 2
+        else
+          #availability = 1
+        end
       end
 
       # increment iteration
       i += 1
-    end while  slots > 0
+      p  Time.now - start
+    end while  slots > 0 && Time.now - start <=10
 
     # update solution and return it additionally (r)
     plan.update(solution: "#{solution_slots}")
@@ -324,13 +349,31 @@ class SemesterPlansController < ApplicationController
       size -= 1
       s
     }
+    #p "sum #{sum}"
+    size = pri_slot.length.to_f
     kumul = 0.0
     pri_slot.each_with_index do  |pri, index|
-      size = pri_slot.length.to_f() - index.to_f
-      kumul += (pri[:priority].to_f * ((size/pri_slot.length.to_f)+1.0))/ sum.to_f
+      #p "DEBUG CALC #{pri[:priority].to_f} * #{((size/pri_slot.length.to_f)+1.0)} / #{sum.to_f}"
+      if sum == 0
+        kumul += 1
+      else
+        kumul += (pri[:priority].to_f * ((size/pri_slot.length.to_f)+1.0))/ sum.to_f
+      end
       roulette << {index: index, value: kumul}
+      size -= 1
     end
+    #p roulette
     roulette
+  end
+
+  def feasible plan
+    plani = eval(plan)
+    plani.each do |pl|
+      if pl[:user] == nil
+        return false
+      end
+    end
+    true
   end
 
   #calculates a valid solution

@@ -1,5 +1,4 @@
 <h1><%=@plan.name%> zulässiger Plan</h1>
-<%= @solution  %>
 <table class="table-hover table-bordered table">
   <tr>
     <th>
@@ -14,9 +13,6 @@
     <th>
        Co-Supporter
     </th>
-    <th>
-      Supporter
-    </th>
 
   </tr>
   <% @solution.each do |s| %>
@@ -27,16 +23,20 @@
     <td>
       <%= TimeSlot.get_time(s[:index].to_i) %>
     </td>
-    <td  class=<%="av#{SemesterPlanConnection.find_it_id(s[:user].to_i, (s[:index].to_i() +1)).availability}" %>>
-      <%= User.find(s[:user].to_i).get_name %>
-    </td>
-     <td>
-     <%= s[:index] %>
-    </td>
-     <td>
-     <%= s[:user] %>
-    </td>
-
+    <% if s[:user] != nil %>
+      <td  class=<%="av#{SemesterPlanConnection.find_it_id(s[:user].to_i, (s[:index].to_i() +1)).availability}" %>>
+            <%= User.find(s[:user].to_i).get_name %>
+      </td>
+    <% else %>
+      <td></td>
+    <% end %>
+    <% if s[:co] != nil %>
+      <td  class=<%="av#{SemesterPlanConnection.find_it_id(s[:co].to_i, (s[:index].to_i() +1)).availability}" %>>
+        <%= User.find(s[:co].to_i).get_name %>
+      </td>
+    <% else %>
+      <td></td>
+    <% end %>
   </tr>
   <% end %>
 </table>
