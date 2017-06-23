@@ -32,7 +32,9 @@ class SemesterPlansController < ApplicationController
   # action for showing a valid solution
   def valid
     @plan = SemesterPlan.find(params[:id])
+    @users = User.where(planable: true)
     @solution = eval(@plan.solution)
+
   end
 
   # action for showing a plan. Users are able to fill in Shiftavailibility
