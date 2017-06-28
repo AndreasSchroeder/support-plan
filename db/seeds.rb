@@ -8,12 +8,12 @@
 
 ran = Random.new
 
-User.create(email: "andschroeder@uos.de", is_admin: true, first_name: "andi", hours: 40)
+User.create(email: "andschroeder@uos.de", is_admin: true, first_name: "andi", last_name: "schroeder", hours: 40)
 User.create(email: "admin@admintest.de", is_admin: true, first_name: "admin", planable: false)
 9.times do |n|
-  User.create(first_name: "Jack#{n}", email: "jack#{n}@uos.de", hours: 30)
+  User.create(first_name: "Jack#{n}",last_name: "#{n}", email: "jack#{n}@uos.de", hours: 30)
 end
-User.create(first_name: "Jack9", email: "jack9@uos.de", hours: 20)
+User.create(first_name: "Jack9", last_name: "9", email: "jack9@uos.de", hours: 20)
 
 
 @plan = SemesterPlan.create(name: "Supportplan", start: Time.now, end: Time.now)

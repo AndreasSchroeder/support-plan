@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   post   '/login',   to: 'sessions#create'
   delete '/logout',  to: 'sessions#destroy'
   post   '/semester_plans/:id', to: 'semester_plans#handle'
-  get    '/semester_plans/:id/valid', to: 'semester_plans#valid', as: 'valid'
+  get    '/semester_plans/:id/valid', to: 'semester_plan_manuals#show', as: 'valid'
   post   '/semester_plans/:id/valid', to: 'semester_plan_manuals#create', as: 'fill'
 
   get 'users/new'

@@ -29,20 +29,13 @@ class SemesterPlansController < ApplicationController
   def index
   end
 
-  # action for showing a valid solution
-  def valid
-    @plan = SemesterPlan.find(params[:id])
-    @users = User.where(planable: true)
-    @solution = eval(@plan.solution)
-
-  end
 
   # action for showing a plan. Users are able to fill in Shiftavailibility
   def show
     @plan = SemesterPlan.find(params[:id])
     @users = User.where(planable: true)
     @slots = []
-    @options = {0 => "gültige Lösung", 1 => "mehrere gültige Lösungn", 2 => "hinreichend optimale Lösung"}
+    @options = {0 => "manuellen Plan erstellen", 1 => "gültige Lösungen berechnen lassen", 2 => "hinreichend optimale Lösung berechnen lassen"}
     @users.each do |user|
       found = !SemesterPlanConnection.are_build?(user, @plan)
       @plan.time_slots.each do |slot|
@@ -100,18 +93,25 @@ class SemesterPlansController < ApplicationController
 
   # switch action to serveral methods
   def optimize(params)
+    plan = SemesterPlan.find(params[:id])
     case params["optimisation"]["kind"]
       when "0"
-          flash[:success] = " Gültiger Plan wurde erstellt."
-          valid_solution2 false
-          if feasible SemesterPlan.find(params[:id]).solution
-            valid_solution2 true
-          end
+        empty_slots = []
+        plan.time_slots.each_with_index do |n, index|
+          empty_slots << {index: index, user: nil, co: nil, slot: n.id}
+        end
+        plan.update(solution: empty_slots)
+        flash[:success] = " Manuelle Planerstellung eingeleitet"
           redirect_to valid_path User.find(params[:id])
       when "1"
-          flash[:success] = " 1 verlinkt!"
+        flash[:success] = " Gültiger Plan wurde erstellt."
+        valid_solution2 false
+        if feasible SemesterPlan.find(params[:id]).solution
+          valid_solution2 true
+        end
+        redirect_to valid_path User.find(params[:id])
       when "2"
-          flash[:success] = " 2 verlinkt!"
+        flash[:success] = " 2 verlinkt!"
     end
 
 

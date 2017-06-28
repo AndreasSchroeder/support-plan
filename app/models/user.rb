@@ -20,6 +20,15 @@ class User < ApplicationRecord
     end
   end
 
+  def get_initial
+    if self.first_name.nil? || self.last_name.nil?
+      return "11"
+    else
+      return "#{self.first_name.first.upcase}#{self.last_name.first.upcase}"
+    end
+
+  end
+
   # returns the sum of all hours of planable users
   def self.hours_sum
     User.where(planable: true).inject(0){|sum,x| sum + x.hours.to_i }

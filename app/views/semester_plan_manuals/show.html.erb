@@ -1,0 +1,115 @@
+<h1><%=@plan.name%> zulässiger Plan</h1>
+<h1><%= @solution %></h1>
+<div class=row >
+  <div class=col-lg-6>
+    <table class="table-hover table-bordered table">
+      <tr>
+        <th>
+          Tag
+        </th>
+        <th>
+          Zeit
+        </th>
+        <% @users.each do |user| %>
+          <th>
+            <div title=<%= user.get_name %>>
+              <%= user.get_initial %>
+            </div>
+          </th>
+        <% end %>
+      </tr>
+
+
+    <% @plan.time_slots.each_with_index do |slot, index| %>
+        <tr >
+        <% if index%4 == 0 %>
+          <td rowspan="4">
+            <%= slot.day %>
+          </td>
+        <% end %>
+        <td>
+          <%= "#{slot.start}:00 - #{slot.end}:00" %>
+        </td>
+          <% @users.each do |user| %>
+            <td class=<%=get_av_user_slot user, slot%> >
+
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+
+
+
+    </table>
+  </div>
+  <div class=col-lg-6>
+    <%= form_for(@plan, :url => {:controller => 'semester_plan_manuals', :action => 'create'}, method: "post") do |f| %>
+
+
+
+      <table class="table-hover table-bordered table">
+        <tr>
+          <th>
+            Tag
+          </th>
+          <th>
+            Schicht
+          </th>
+          <th>
+            Supporter
+          </th>
+          <th>
+             Co-Supporter
+          </th>
+
+        </tr>
+        <% @solution.each do |s| %>
+          <% if !current_user.is_admin? %>
+            <tr>
+              <td>
+                <%= TimeSlot.get_day(s[:index].to_i) %>
+              </td>
+              <td>
+                <%= TimeSlot.get_time(s[:index].to_i) %>
+              </td>
+              <% if s[:user] != nil %>
+                <td  class=<%=get_av s, false  %>>
+                  <%= User.find(s[:user].to_i).get_name %>
+                </td>
+              <% else %>
+                <td></td>
+              <% end %>
+              <% if s[:co] != nil %>
+                <td  class=<%= get_av s, true %>>
+                  <%= User.find(s[:co].to_i).get_name %>
+                </td>
+              <% else %>
+                <td></td>
+              <% end %>
+            </tr>
+          <% else %>
+            <tr>
+              <td>
+                <%= TimeSlot.get_day(s[:index].to_i) %>
+              </td>
+              <td>
+                <%= TimeSlot.get_time(s[:index].to_i) %>
+              </td>
+              <td>
+
+                <%= f.select("1;#{s[:index]}", options_for_select(get_collection s, false),  {:selected => 0}, { class: (get_av(s, false))})%>
+
+              </td>
+              <td>
+                <%= f.select("2;#{s[:index]}", options_for_select(get_collection s, true),  {:selected => 0}, { class: (get_av(s, true))})%>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </table>
+      <% if current_user.is_admin? %>
+        <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
+      <% end %>
+    <% end %>
+  </div>
+</div>
