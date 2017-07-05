@@ -96,11 +96,13 @@ class SemesterPlansController < ApplicationController
     plan = SemesterPlan.find(params[:id])
     case params["optimisation"]["kind"]
       when "0"
-        empty_slots = []
-        plan.time_slots.each_with_index do |n, index|
-          empty_slots << {index: index, user: nil, co: nil, slot: n.id}
+        if plan.solution.nil?
+          empty_slots = []
+          plan.time_slots.each_with_index do |n, index|
+            empty_slots << {index: index, user: nil, co: nil, slot: n.id}
+          end
+          plan.update(solution: empty_slots)
         end
-        plan.update(solution: empty_slots)
         flash[:success] = " Manuelle Planerstellung eingeleitet"
           redirect_to valid_path User.find(params[:id])
       when "1"

@@ -7,6 +7,7 @@ class SemesterPlanManualsController < ApplicationController
     @plan = SemesterPlan.find(params[:id])
     p params["semester_plan"]
     @solution = eval(@plan.solution)
+    break_this = false
     params["semester_plan"].each do |key, value|
       type = key.split(";").first
       index = key.split(";").last
@@ -14,12 +15,27 @@ class SemesterPlanManualsController < ApplicationController
         value = nil
       end
       if type == "1"
-        @solution.detect {|s| s[:index].to_i == index.to_i}[:user] = value
+        slot = @solution.detect {|s| s[:index].to_i == index.to_i}
+        if slot[:co] != value
+          slot[:user] = value
+        else
+
+          break_this = true
+        end
       elsif type == "2"
-        @solution.detect {|s| s[:index].to_i == index.to_i}[:co] = value
+        slot = @solution.detect {|s| s[:index].to_i == index.to_i}
+        if slot[:user] != value
+          slot[:co] = value
+        else
+          break_this = true
+        end
       end
     end
-    @plan.update(solution: "#{@solution}")
+    if !break_this
+      @plan.update(solution: "#{@solution}")
+    else
+        flash[:warning] = "Abgebrochen! Support und Co-Supporter müssen sich unterscheiden"
+    end
     redirect_to valid_path(@plan)
   end
 

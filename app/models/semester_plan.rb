@@ -1,6 +1,81 @@
 class SemesterPlan < ApplicationRecord
+  include ApplicationHelper
   has_many :time_slots
 
+
+
+  def get_fitness_of_solution
+    solution = eval(self.solution)
+    if solution == nil
+      return {fitness: 0, unfitness: 0}
+    end
+
+    fitness = solution.inject(0){|sum, v|
+      case get_av v, false
+      when "av1"
+        sum + 3
+      when "av2"
+        sum + 1
+      when "av3"
+        sum + -5
+      else
+        sum + 0
+      end
+    }
+
+    days = [[], [], [], [], []]
+    solution.each do |s|
+      days[s[:index].to_i/5].push s
+    end
+    fitness += days.inject(0){|sum, day|
+      last = nil
+      sum + day.each_with_index.inject(0) do|sum2, (shift, index)|
+        if index != 0
+          p "Shift: #{shift}"
+          p "Last : #{last}"
+          if shift[:user] == last[:user]
+            if sum2 == 0
+              sum2 += 2
+            else
+              sum2 += 1
+            end
+          end
+        end
+        last = shift
+        sum2
+      end
+    }
+    unfitness = solution.inject(0){|sum, v|
+      case get_av v, false
+      when "av3"
+        sum + 1
+      else
+        sum + 0
+      end
+    }
+    return {fitness: fitness, unfitness: unfitness}
+  end
+
+  def get_amount_of_shifts_in_solution user
+    solution = eval(self.solution)
+
+    a = solution.inject(0){|sum, x|
+      if x[:user].to_i == user.id
+        sum + 1
+      else
+        sum + 0
+      end
+    }
+    b = solution.inject(0){|sum, x|
+      if x[:co].to_i == user.id
+        sum + 1
+      else
+        sum + 0
+      end
+    }
+
+    return "#{a}/#{b}"
+  end
 
   def get_slot_priority
     slots = self.time_slots
