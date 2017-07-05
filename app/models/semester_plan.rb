@@ -4,8 +4,8 @@ class SemesterPlan < ApplicationRecord
 
 
 
-  def get_fitness_of_solution
-    solution = eval(self.solution)
+  def get_fitness_of_solution (solution)
+
     if solution == nil
       return {fitness: 0, unfitness: 0}
     end
@@ -31,8 +31,6 @@ class SemesterPlan < ApplicationRecord
       last = nil
       sum + day.each_with_index.inject(0) do|sum2, (shift, index)|
         if index != 0
-          p "Shift: #{shift}"
-          p "Last : #{last}"
           if shift[:user] == last[:user]
             if sum2 == 0
               sum2 += 2
@@ -49,8 +47,10 @@ class SemesterPlan < ApplicationRecord
       case get_av v, false
       when "av3"
         sum + 1
-      else
+      when "av2", "av1"
         sum + 0
+      else
+        sum + 10
       end
     }
     return {fitness: fitness, unfitness: unfitness}

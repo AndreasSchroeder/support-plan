@@ -107,13 +107,23 @@ class SemesterPlansController < ApplicationController
           redirect_to valid_path User.find(params[:id])
       when "1"
         flash[:success] = " Gültiger Plan wurde erstellt."
-        valid_solution2 false
-        if feasible SemesterPlan.find(params[:id]).solution
-          valid_solution2 true
+        plan.update(solution: "#{valid_solution2 false}")
+        p "Soltuion: #{plan.solution}"
+
+        if feasible plan.solution
+          plan.update(solution: "#{valid_solution2 true}")
         end
         redirect_to valid_path User.find(params[:id])
       when "2"
+        plan.update(solution: "#{heuristic (plan)}")
+        p "Soltuion: #{plan.solution}"
+        if feasible plan.solution
+          plan.update(solution: "#{valid_solution2 true}")
+        end
         flash[:success] = " 2 verlinkt!"
+        redirect_to semester_plan_path
+
+
     end
 
 
@@ -151,6 +161,96 @@ class SemesterPlansController < ApplicationController
         time_mult = 3
     end
     return time_mult + 4 * day_mult
+
+  end
+
+  def heuristic plan
+    solutions = start_solution plan
+    50.times do
+      parents = selection plan, solutions
+      solutions << generate_child_solution(plan, parents)
+      solutions = sort_soluitons(plan, solutions).first(10)
+    end
+    solutions.first
+  end
+
+  # Selecte two best of four random
+  def selection plan, solutions
+    (sort_soluitons plan, solutions.shuffle.first(4)).first(2)
+  end
+
+  def sort_soluitons plan, solutions
+    solutions.sort_by{|s| [plan.get_fitness_of_solution(s)[:fitness] * -1, plan.get_fitness_of_solution(s)[:unfitness].to_i]}
+  end
+
+  def generate_child_solution plan, parents
+    father = parents[0]
+    mother = parents[1]
+
+    child_one = father.first(10)
+    child_two = mother.first(10)
+    father_rest = father.last(10)
+    mother_rest = mother.last(10)
+    last = child_one.last
+    mother.each_with_index do |m, index|
+      if father_rest.any?
+        element = father_rest.detect{|x| x[:user]==m[:user]}
+        if element
+          slot = father.detect{|x| x[:index].to_i == last[:index].to_i + 1}[:slot].to_i
+          child_one << {index: last[:index] + 1, user: m[:user].to_i, co: nil, slot: slot}
+          father_rest.delete(element)
+          last = child_one.last
+        end
+      end
+    end
+    last = child_two.last
+    father.each_with_index do |m, index|
+      if mother_rest.any?
+        element = mother_rest.detect{|x| x[:user]==m[:user]}
+        if element
+          slot = father.detect{|x| x[:index].to_i == last[:index].to_i + 1}[:slot].to_i
+          child_two << {index: last[:index].to_i + 1, user: m[:user].to_i, co: nil, slot: slot}
+          mother_rest.delete(element)
+          last = child_two.last
+        end
+      end
+    end
+    mutate plan, sort_soluitons(plan, [child_one, child_two]).first
+
+  end
+
+  def mutate plan, child
+    child
+  end
+
+  # Calculates 20 Start solutions
+  def start_solution plan
+    solutions = []
+    1.times do
+      s = valid_solution2(false)
+      solutions << s
+    end
+
+    10.times do
+      s = random_solution plan
+      solutions << s
+    end
+    sort_soluitons plan, solutions
+  end
+
+  def random_solution plan
+    user = []
+    User.supporter_amount_of_shifts.each do  |s|
+      s[:shifts].to_i.times do
+        user << s[:user].to_i
+      end
+    end
+    user.shuffle!
+    empty_slots = []
+    plan.time_slots.each_with_index do |slot, index|
+      empty_slots << {index: index, user: user[index].to_i, co: nil, slot: slot.id}
+    end
+    empty_slots
 
   end
 
@@ -237,7 +337,6 @@ class SemesterPlansController < ApplicationController
             break
           end
         end
-        p "DER SLOT: #{slot}"
 
         # saves the found user
         found_user = nil
@@ -339,11 +438,9 @@ class SemesterPlansController < ApplicationController
 
       # increment iteration
       i += 1
-      p  Time.now - start
     end while  slots > 0 && Time.now - start <=10
 
     # update solution and return it additionally (r)
-    plan.update(solution: "#{solution_slots}")
     solution_slots
 
   end
@@ -383,90 +480,6 @@ class SemesterPlansController < ApplicationController
     true
   end
 
-  #calculates a valid solution
-  def valid_solution
-    rnd = Random.new
-    # plan to solve
-    plan = SemesterPlan.find(params[:id])
-    # timeslots in plan
-    real_slots = plan.time_slots
-    # fill slots with index. 0 => motag 8:00 ...
-    empty_slots = []
-    20.times do |n|
-      empty_slots << {index: n, user: nil}
-    end
-    # Variables for iteration options
-    iteration = 0
-    iteration_max = 1000
-    availability = 1
-    iterations_for_2 = 500
-    solution_slots = []
-    # repeat until solution found
-    begin
-      # break varaibale
-      apport = false
-      open_slots = 20
-      # calculates shifts per supporter
-      shifts = User.supporter_amount_of_shifts
-      solution_slots = empty_slots.clone
-      solution_slots.each do |slot|
-        if !apport
-          users = []
-
-          # get all users for current slot, which are available in the slot
-          real_slots.find_by(TimeSlot.find_slot_by_type(slot[:index])).semester_plan_connections.where("availability >= :start AND availability <= :end",
-              {start: 1, end: availability}).each do |connection|
-            if connection.user.planable?
-              users << connection.user
-            end
-          end
-
-          # break variables
-          done = false
-          max_trys = users.length * users.length
-
-          # iteration of user-slot-connection-try
-          i = 0
-
-          # repeat until max trys reached (apport) or current shift occupied
-          while !done
-            if users.length != 0
-              # select random user
-              user = users[rnd.rand(0..users.length()-1)]
-              # get shift per supporter for user
-              shift = shifts.select{|u| u[:user] == user.id}
-              # allocate user to slot(shift)
-              slot[:user] = user.id
-
-              # test if users has shifts left
-              if shift.first[:shifts] != 0
-                open_slots -= 1
-                shift.first[:shifts] -= 1
-                done = true
-              end
-              # break condition
-              if i >= max_trys
-                done = true
-                apport = true
-              end
-            end
-            i += 1
-          end
-        end
-
-      end
-
-      # increase iteration and test if availablity 2 is ok until now
-      iteration += 1
-      if iteration == iterations_for_2
-        availability = 2
-      end
-    # break condition
-    end while open_slots > 0 && iteration < iteration_max
-
-    # return
-    plan.update(solution: "#{solution_slots}")
-  end
 
 
 end
