@@ -78,7 +78,6 @@ class SemesterPlansController < ApplicationController
 
   # connects User with timeslot
   def connect(params)
-    #p params["connections"]
     params["connections"].each do |key, value|
       value = value.to_i
       if value == 0 || value == 1 || value == 2 || value == 3
@@ -107,27 +106,20 @@ class SemesterPlansController < ApplicationController
           redirect_to valid_path User.find(params[:id])
       when "1"
         flash[:success] = " Gültiger Plan wurde erstellt."
-        plan.update(solution: "#{valid_solution2 false}")
-        p "Soltuion: #{plan.solution}"
+        plan.update(solution: "#{mutate_pairs(plan, valid_solution2(false))}")
 
         if feasible plan.solution
-          plan.update(solution: "#{valid_solution2 true}")
+          plan.update(solution: "#{valid_solution2(true)}")
         end
         redirect_to valid_path User.find(params[:id])
       when "2"
         plan.update(solution: "#{heuristic (plan)}")
-        p "Soltuion: #{plan.solution}"
         if feasible plan.solution
           plan.update(solution: "#{valid_solution2 true}")
         end
         flash[:success] = " 2 verlinkt!"
-        redirect_to semester_plan_path
-
-
+        redirect_to valid_path User.find(params[:id])
     end
-
-
-
   end
 
   # gets the index of a slot type.
@@ -166,12 +158,17 @@ class SemesterPlansController < ApplicationController
 
   def heuristic plan
     solutions = start_solution plan
-    50.times do
+    5.times do
       parents = selection plan, solutions
       solutions << generate_child_solution(plan, parents)
-      solutions = sort_soluitons(plan, solutions).first(10)
+      solutions = sort_soluitons(plan, solutions).first(25)
     end
-    solutions.first
+    s = solutions.first
+    10.times do
+
+      s = mutate_pairs plan, solutions.first
+    end
+    s
   end
 
   # Selecte two best of four random
@@ -186,53 +183,100 @@ class SemesterPlansController < ApplicationController
   def generate_child_solution plan, parents
     father = parents[0]
     mother = parents[1]
+    border_number = rand(18) + 1
 
-    child_one = father.first(10)
-    child_two = mother.first(10)
-    father_rest = father.last(10)
-    mother_rest = mother.last(10)
+    child_one = father.first(border_number)
+    child_two = mother.first(border_number)
+    father_rest = father.last(20 - border_number)
+    mother_rest = mother.last(20 - border_number)
     last = child_one.last
     mother.each_with_index do |m, index|
       if father_rest.any?
-        element = father_rest.detect{|x| x[:user]==m[:user]}
-        if element
+
           slot = father.detect{|x| x[:index].to_i == last[:index].to_i + 1}[:slot].to_i
           child_one << {index: last[:index] + 1, user: m[:user].to_i, co: nil, slot: slot}
-          father_rest.delete(element)
+          father_rest.delete(father.detect{|x| x[:index].to_i == last[:index].to_i + 1})
           last = child_one.last
-        end
       end
     end
     last = child_two.last
     father.each_with_index do |m, index|
       if mother_rest.any?
-        element = mother_rest.detect{|x| x[:user]==m[:user]}
-        if element
-          slot = father.detect{|x| x[:index].to_i == last[:index].to_i + 1}[:slot].to_i
+
+          slot = mother.detect{|x| x[:index].to_i == last[:index].to_i + 1}[:slot].to_i
           child_two << {index: last[:index].to_i + 1, user: m[:user].to_i, co: nil, slot: slot}
-          mother_rest.delete(element)
+          mother_rest.delete(mother.detect{|x| x[:index].to_i == last[:index].to_i + 1})
           last = child_two.last
-        end
       end
     end
+
     mutate plan, sort_soluitons(plan, [child_one, child_two]).first
 
   end
 
   def mutate plan, child
-    child
+    rotate_clone = child.clone
+    rotate_clone.rotate!
+    opt_clone = child.clone
+    opt_clone = mutate_pairs plan, opt_clone
+    sort_soluitons(plan, [child, rotate_clone, opt_clone]).first
+  end
+
+  def mutate_pairs plan, child
+    origin = child.clone
+    p " origin: #{plan.get_fitness_of_solution origin} #{origin}"
+    elem0 = nil
+    elem1 = nil
+    19.times do |n|
+      elem0 = child[n]
+      elem1 = child[n + 1]
+      if elem0[:user] != elem1[:user]
+         users0 = TimeSlot.find(elem0[:slot]).get_users 1
+         users1 = TimeSlot.find(elem1[:slot]).get_users 1
+         if users1.detect{|x| x.to_i == elem0[:user].to_i}
+          slots = plan.get_slots_of_user_av1 child, elem0[:user], elem1[:user], elem0[:slot], elem1[:slot]
+          if slots.any?
+            p "write #{elem0[:user]} (#{n}) to  #{elem1[:user]} (#{n+1})"
+            slot = slots.shuffle.first
+            p "swrite #{elem1[:user]} (#{n+1}) to #{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user]} (#{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:index]})"
+
+            child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user] = elem1[:user].to_i
+            child[n + 1][:user] = elem0[:user].to_i
+            p " child: #{plan.get_fitness_of_solution child} #{child}"
+          end
+        elsif users0.detect{|x| x.to_i == elem1[:user].to_i}
+          slots = plan.get_slots_of_user_av1 child, elem1[:user], elem0[:user], elem1[:slot], elem0[:slot]
+          if slots.any?
+            p "write2 #{elem1[:user]} (#{n}) to  #{elem0[:user]} (#{n+1})"
+            slot = slots.shuffle.first
+            p "swrite2 #{elem0[:user]} (#{n+1}) to #{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user]} (#{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:index]})"
+            child.detect{|x| x[:slot].to_i == slot.id.to_i}[:user] = elem0[:user].to_i
+            child[n][:user] = elem1[:user].to_i
+          end
+        end
+      end
+    end
+    p " child: #{plan.get_fitness_of_solution child} #{child}"
+
+    (sort_soluitons(plan, [child, origin])).first
+
+
   end
 
   # Calculates 20 Start solutions
   def start_solution plan
     solutions = []
-    1.times do
-      s = valid_solution2(false)
+    10.times do
+      s =  mutate_pairs plan, valid_solution2(false)
       solutions << s
     end
 
     10.times do
       s = random_solution plan
+    end
+
+    10.times do
+      s = structured_solution plan
       solutions << s
     end
     sort_soluitons plan, solutions
@@ -249,6 +293,21 @@ class SemesterPlansController < ApplicationController
     empty_slots = []
     plan.time_slots.each_with_index do |slot, index|
       empty_slots << {index: index, user: user[index].to_i, co: nil, slot: slot.id}
+    end
+    empty_slots
+
+  end
+
+  def structured_solution plan
+    shifts = User.supporter_amount_of_shifts.shuffle
+    empty_slots = []
+    user = shifts.shift
+    plan.time_slots.each_with_index do |slot, index|
+      empty_slots << {index: index, user: user[:user].to_i, co: nil, slot: slot.id}
+      user[:shifts] = user[:shifts].to_i - 1
+      if user[:shifts] == 0
+        user = shifts.shift
+      end
     end
     empty_slots
 
@@ -340,7 +399,6 @@ class SemesterPlansController < ApplicationController
 
         # saves the found user
         found_user = nil
-        #p slot[:slot]
         # return all user with given availbility in current slot
         users = TimeSlot.find(slot[:slot]).get_users availability
 
@@ -361,8 +419,6 @@ class SemesterPlansController < ApplicationController
                 # if user is found and in earlier iterations no user was found for this slot
                 if (pr_user[:user] == slot_user && !found) &&(co_support && solution_slots.detect {|s| s[:index] == slot[:index]}[:user] !=slot_user || !co_support)
 
-                  #p "slot: #{slot} #{slot_user} "
-                  #p "user: #{}"
 
                      # saves user for slot
                     if co_support
@@ -398,7 +454,6 @@ class SemesterPlansController < ApplicationController
                   slot_priority.sort_by! {|item|
                     item[:priority] * -1
                   }
-                  #p "slot pri #{slot_priority}"
                   # removes slot from user_priority and sort
                   user_priority = SemesterPlan.kill_slot_in_user_priority slot[:slot], user_priority
                   user_priority.sort_by! {|item|
@@ -453,11 +508,9 @@ class SemesterPlansController < ApplicationController
       size -= 1
       s
     }
-    #p "sum #{sum}"
     size = pri_slot.length.to_f
     kumul = 0.0
     pri_slot.each_with_index do  |pri, index|
-      #p "DEBUG CALC #{pri[:priority].to_f} * #{((size/pri_slot.length.to_f)+1.0)} / #{sum.to_f}"
       if sum == 0
         kumul += 1
       else
@@ -466,7 +519,6 @@ class SemesterPlansController < ApplicationController
       roulette << {index: index, value: kumul, slot: pri[:slot]}
       size -= 1
     end
-    #p roulette
     roulette
   end
 

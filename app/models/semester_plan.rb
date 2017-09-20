@@ -9,7 +9,6 @@ class SemesterPlan < ApplicationRecord
     if solution == nil
       return {fitness: 0, unfitness: 0}
     end
-
     fitness = solution.inject(0){|sum, v|
       case get_av v, false
       when "av1"
@@ -30,12 +29,10 @@ class SemesterPlan < ApplicationRecord
     fitness += days.inject(0){|sum, day|
       last = nil
       sum + day.each_with_index.inject(0) do|sum2, (shift, index)|
-        if index != 0
+        if last
           if shift[:user] == last[:user]
-            if sum2 == 0
+            if shift[:index]%4 != 0
               sum2 += 2
-            else
-              sum2 += 1
             end
           end
         end
@@ -141,6 +138,20 @@ class SemesterPlan < ApplicationRecord
       item[:priority] * -1
     }
     priority
+  end
+
+  def get_slots_of_user_av1 solution, u0, u1, s0, s1
+    slots = []
+    user0 = User.find(u0)
+    user1 = User.find(u1)
+    slot0 = s0.to_i
+    slot1 = s1.to_i
+    self.time_slots.each do |slot|
+      if solution.detect{|x| x[:slot].to_i == slot.id.to_i}[:user].to_i == u0.to_i && SemesterPlanConnection.find_it_id(user1.id, slot.id).availability == 1 && SemesterPlanConnection.find_it_id(user0.id, slot1).availability == 1 && slot.id.to_i != slot1.to_i && slot.id.to_i != slot0.to_i
+        slots << slot
+      end
+    end
+    slots
   end
 
 
