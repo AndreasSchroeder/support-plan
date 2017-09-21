@@ -13,19 +13,28 @@
                             </a>
                             <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
 
-                                <li class="dropdown-submenu">
-                                    <%= link_to "Benutzer", "#" %>
-                                    <ul class="dropdown-menu">
-                                        <li><%= link_to "Benutzer verwalten", users_path %></li>
-                                    </ul>
+                                <li >
+                                <% if is_admin? %>
+                                    <%= link_to "Benutzereinstellungen", users_path %>
+                                <% else %>
+                                    <%= link_to "Benutzer", users_path %>
+
+                                <% end %>
                                 </li>
-                                <li class="dropdown-submenu">
-                                    <%= link_to "Supportpläne", root_path %>
-                                    <ul class="dropdown-menu">
-                                        <li><%= link_to "Semesterplan erstellen", new_semester_plan_path %></li>
-                                        <li><%= link_to "Ferienplan erstellen", new_semester_break_plan_path %></li>
-                                    </ul>
-                                </li>
+                                <% if is_admin? %>
+                                    <li class="dropdown-submenu">
+                                        <%= link_to "Supportpläne", root_path %>
+                                        <ul class="dropdown-menu">
+                                            <li><%= link_to "Semesterplan erstellen", new_semester_plan_path %></li>
+                                            <li><%= link_to "Ferienplan erstellen", new_semester_break_plan_path %></li>
+                                        </ul>
+                                    </li>
+                                <% else %>
+                                    <li >
+                                       <%= link_to "Supportpläne", root_path %>
+                                    </li>
+                                <% end %>
+
 
 
                                 <li class="divider"></li>

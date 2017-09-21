@@ -1,34 +1,39 @@
 class UsersController < ApplicationController
     # filters
-    before_action :logged_in_user, only: [:index, :edit, :update, :destroy]
+    before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy]
     before_action :admin_user, only: [:index, :edit, :update, :destroy]
 
   # lists all users
   def index
     @user = User.new
-    @users = User.all
+    @users = User.where(planable: true)
   end
 
   # for fill userdata
   def create
     @users = User.all
-    if (User.find_by(email: checks_email_alternativ(params[:user][:email].downcase))) == nil
-      @user = User.new(question_params)
-      if @user.save
-        @user.update(email: checks_email_alternativ(@user.email))
-        flash[:success] = "Benutzer wurde angelegt."
+    @user = User.find_by(email: checks_email_alternativ(params[:user][:email].downcase))
+    if @user
+      @user.update(planable: true)
+      flash[:success] = "Benutzer wurde reaktiviert."
+    elsif @user = User.new(email: params[:user][:email])
+      if is_ldap? @user.email
+        if @user.save
+          @user.update(email: checks_email_alternativ(@user.email))
+          flash[:success] = "Benutzer wurde aktiviert."
+        end
       else
-        flash[:danger] = "Anlegen ist fehlgeschlagen."
+      flash[:danger] = "User nicht im LDAP-System."
       end
     else
-      flash[:danger] = "Benutzer existiert bereits"
+      flash[:danger] = "Anlegen ist fehlgeschlagen."
     end
     redirect_to action: :index
   end
 
   # action for deleting
   def destroy
-    User.find(params[:id]).destroy
+    User.find(params[:id]).update(planable: false)
     flash[:success] = "Benutzer wurde gelöscht"
     redirect_to action: :index
   end

@@ -40,6 +40,7 @@
         <%= "#{user.first_name} #{user.last_name}" %>
       </td>
       <td>
+
         <%= "#{user.hours}" %>
       </td>
         <%@plan.time_slots.each_with_index do |slot, index| %>
@@ -111,7 +112,7 @@
     </tr>
   <% end %>
 </table>
-  <% if current_user.planable || current_user.is_admin? %>
+  <% if current_user.planable || is_admin? %>
     <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
   <% end %>
 <% end %>

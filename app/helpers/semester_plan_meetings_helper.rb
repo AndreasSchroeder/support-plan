@@ -1,0 +1,2 @@
+module SemesterPlanMeetingsHelper
+end

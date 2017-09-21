@@ -11,6 +11,9 @@ Rails.application.routes.draw do
   post   '/semester_plans/:id', to: 'semester_plans#handle'
   get    '/semester_plans/:id/valid', to: 'semester_plan_manuals#show', as: 'valid'
   post   '/semester_plans/:id/valid', to: 'semester_plan_manuals#create', as: 'fill'
+  patch   '/semester_plans/:id/valid', to: 'semester_plan_manuals#update', as: 'save'
+  get    '/semester_plans/:id/meeting', to: 'semester_plan_meetings#show', as: 'meeting'
+  post   '/semester_plans/:id/meeting', to: 'semester_plan_meetings#create'
 
   get 'users/new'
 

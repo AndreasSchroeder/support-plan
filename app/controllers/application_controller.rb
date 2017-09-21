@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
- 
+
   include SessionsHelper
 
       # conect to LDAP servers and update the given user. This method will be called if a login occured with an @uos.de or @uni-osnabrueck.de
@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
     def checks_email_alternativ (email)
         array = email.split("@")
         if array.last.downcase == "uni-osnabrueck.de" || array.last.downcase == "uos.de"
-            mail = array.first + "@uos.de"
+            mail = array.first + "@uni-osnabrueck.de"
             @user = User.find_by(email: mail)
             return mail.downcase
         else

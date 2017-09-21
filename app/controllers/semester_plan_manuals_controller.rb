@@ -7,7 +7,9 @@ class SemesterPlanManualsController < ApplicationController
     @plan = SemesterPlan.find(params[:id])
     p params["semester_plan"]
     @solution = eval(@plan.solution)
-    break_this = false
+    @fixed_solution = eval(@plan.fixed_solution)
+
+    origin = eval(@plan.solution)
     params["semester_plan"].each do |key, value|
       type = key.split(";").first
       index = key.split(";").last
@@ -16,25 +18,27 @@ class SemesterPlanManualsController < ApplicationController
       end
       if type == "1"
         slot = @solution.detect {|s| s[:index].to_i == index.to_i}
-        if slot[:co] != value
-          slot[:user] = value
-        else
-
-          break_this = true
-        end
+        slot[:user] = value
       elsif type == "2"
         slot = @solution.detect {|s| s[:index].to_i == index.to_i}
-        if slot[:user] != value
-          slot[:co] = value
-        else
-          break_this = true
-        end
+        slot[:co] = value
       end
     end
+    break_this = false
+    without_error = []
+    @solution.zip origin.each do | sol, ori|
+      if sol[:user] == sol[:co]
+        without_error << ori
+        break_this = true
+      else
+        without_error << sol
+      end
+    end
+    @plan.update(solution: "#{without_error}")
     if !break_this
-      @plan.update(solution: "#{@solution}")
+      flash[:success] = "Neue Werte übernommen."
     else
-        flash[:warning] = "Abgebrochen! Support und Co-Supporter müssen sich unterscheiden"
+      flash[:warning] = "Support und Co-Supporter müssen sich unterscheiden!Betroffene Zeilen nicht übernommen."
     end
     redirect_to valid_path(@plan)
   end
@@ -42,9 +46,24 @@ class SemesterPlanManualsController < ApplicationController
   # action for showing a valid solution
   def show
     @plan = SemesterPlan.find(params[:id])
-    @users = User.where(planable: true)
+    @users = []
+    @scores = @plan.best_meeting_dates
+    @users = User.users_of_plan @plan
     @solution = eval(@plan.solution)
 
+
+  end
+
+  def update
+    @plan = SemesterPlan.find(params[:id])
+    @solution = eval(@plan.solution)
+    redirect_to valid_path(@plan)
+    if @plan.update(fixed_solution: "#{@solution}")
+    @fixed_solution = eval(@plan.fixed_solution)
+      flash[:success] = "Neue Belegung für Plan gespeichert #{ @plan.get_fitness_of_solution @fixed_solution}."
+    else
+      flash[:success] = "Es ist ein Fehler aufgetreten."
+    end
 
   end
 

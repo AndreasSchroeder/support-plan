@@ -1,39 +1,48 @@
 <% @page_title = "UserAuth | Signup" %>
 <div class="Benutzer hinzufügen">
   <h1>Benutzerverwaltung</h1>
-  <div class="row well"> 
+  <div class="row well">
     <p>
-      Um einen Benutzer hinzuzufügen muss die Uni-Email-Adresse des Benutzers eingegeben werden. Dieser kann sich daraufhin mit seiner RZ-Kennung und dem zugehörigen Passwort anmelden. 
+      Um einen Benutzer hinzuzufügen muss die Uni-Email-Adresse des Benutzers eingegeben werden. Dieser kann sich daraufhin mit seiner RZ-Kennung und dem zugehörigen Passwort anmelden.
     </p>
   </div>
-  <div class="row well"> 
-    <div class="col-md-6">
-      <%= render 'form' %>
-    </div>
-    <% if @users.any? %>
-    <h3>
-      Benutzer:
-    </h3>
+
+    <div class="row well">
       <div class="col-md-6">
-        <% @users.each do |user| %>
-          <div class="well"
-            <p>
-              <b> 
-                Name:
-              </b>
-              <%= "#{user.get_name}" %>
-            </p>
-            <p>
-              <b> 
-                Email:
-              </b>
-              <%= "#{user.email} " %>
-            </p>
-            <%= link_to "Nutzer löschen", user,  method: :delete, data: { confirm: "Soll dieser Benutzer wirklich entfernt werden?" } %>
-          </div>
-        <% end %>
+        <%= render 'form' %>
       </div>
-    <% end %>
-  </div>
-  
+      <% if @users.any? %>
+        <%= form_for(:user, :url => {:controller => 'users', :action => 'create'}) do |f| %>
+
+          <h3>
+            Benutzer:
+          </h3>
+            <% @users.each do |user| %>
+              <div class="well col-md-6">
+                <p>
+                  <b>
+                    Name:
+                  </b>
+                  <%= "#{user.get_name}" %>
+                </p>
+                <p>
+                  <b>
+                    Email:
+                  </b>
+                  <%= "#{user.email} " %>
+                </p>
+                <p>
+                  <b>
+                    Stunden:
+                  </b>
+                  <%= "#{user.email} " %>
+                </p>
+                <%= link_to "Nutzer löschen", user,  method: :delete, data: { confirm: "Soll dieser Benutzer wirklich entfernt werden?" } %>
+              </div>
+            <% end %>
+        <%= f.submit :Speichern, class:"btn btn-lg btn-primary"%>
+      <% end %>
+    </div>
+  <% end %>
+
 </div>

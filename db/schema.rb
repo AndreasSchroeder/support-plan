@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170530154528) do
+ActiveRecord::Schema.define(version: 20170921135926) do
 
   create_table "day_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.date     "start"
@@ -56,10 +56,13 @@ ActiveRecord::Schema.define(version: 20170530154528) do
     t.datetime "start"
     t.datetime "end"
     t.string   "name"
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
-    t.boolean  "free",                     default: false
-    t.text     "solution",   limit: 65535
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.boolean  "free",                         default: false
+    t.text     "solution",       limit: 65535
+    t.string   "meeting_day"
+    t.integer  "meeting_time"
+    t.text     "fixed_solution", limit: 65535
   end
 
   create_table "time_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

@@ -24,7 +24,7 @@ class SemesterPlan < ApplicationRecord
 
     days = [[], [], [], [], []]
     solution.each do |s|
-      days[s[:index].to_i/5].push s
+      days[s[:index].to_i/4].push s
     end
     fitness += days.inject(0){|sum, day|
       last = nil
@@ -37,6 +37,7 @@ class SemesterPlan < ApplicationRecord
           end
         end
         last = shift
+
         sum2
       end
     }
@@ -152,6 +153,34 @@ class SemesterPlan < ApplicationRecord
       end
     end
     slots
+  end
+
+  def ready_to_plan?
+    self.time_slots.each do |slot|
+      slot.semester_plan_connections.each do |con|
+        if con.availability == 0 || con.availability == nil
+          return false
+        end
+      end
+    end
+    return true
+  end
+
+  def best_meeting_dates
+    meetings =  []
+    self.time_slots.each do |slot|
+      score = slot.semester_plan_connections.inject(0){|sum, c |
+        value = 0
+        if c.availability == 1
+          value = 1
+        end
+        sum + value
+      }
+      meetings << {score: score, slot: slot}
+    end
+    meetings.sort_by do |item|
+      item[:score] * -1
+    end
   end
 
 

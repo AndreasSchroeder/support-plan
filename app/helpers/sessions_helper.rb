@@ -26,6 +26,14 @@ module SessionsHelper
         end
     end
 
+    def is_current?
+        if current_user == nil
+            return false
+        else
+            return current_user == User.find(params[:id])
+        end
+    end
+
     # Remembers a user in a persistent session.
     def remember(user)
         user.remember

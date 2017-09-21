@@ -9,31 +9,32 @@
       <%= link_to "Semesterferienplan erstellen", new_semester_break_plan_path, class: "btn btn-lg btn-primary" %>
     </div>
   </div>
-  <div class="row well">
-    <% if @plans.any? %>
-      <div class="col-md-6 well">
-       <h3>
-        Pläne
-      </h3>
-        <% @plans.each do |plan| %>
-          <div class="col-md-6 well">
-            <h4>
-              <%= link_to "#{plan.name}" , semester_plan_path(plan.id) %>
-            </h4>
-            <p>
-              Start: <%= plan.start %>
-              End: <%= plan.end %>
-            </p>
-            <% if plan.solution != nil %>
-              <h4>
-                <%= link_to "Einteilung" , valid_path(plan.id) %>
-              </h4>
-
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
-
 <% end %>
+
+<div class="row well">
+  <% if @plans.any? %>
+    <div class="col-md-6 well">
+     <h3>
+      Pläne
+    </h3>
+      <% @plans.each do |plan| %>
+        <div class="col-md-6 well">
+          <h4>
+            <%= link_to "#{plan.name}" , semester_plan_path(plan.id) %>
+          </h4>
+          <p>
+            Start: <%= plan.start %>
+            End: <%= plan.end %>
+          </p>
+          <% if plan.solution != nil %>
+            <h4>
+              <%= link_to "Einteilung" , valid_path(plan.id) %>
+            </h4>
+
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
