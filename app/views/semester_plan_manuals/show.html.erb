@@ -1,6 +1,4 @@
 <h1><%=@plan.name%>: Plan erstellen</h1>
-<h1><%=@plan.get_fitness_of_solution @solution%></h1>
-<h1><%=@plan.get_fitness_of_solution @fixed_solution%></h1>
 <div class=row >
   <div class=col-lg-12>
     <%= form_for(@plan, :url => {:controller => 'semester_plan_manuals', :action => 'create'}, method: "post") do |f| %>
@@ -116,29 +114,58 @@
         <% end %>
       </table>
       <% if current_user.is_admin? %>
-        <div class=col-lg-6>
-          <%= f.submit :Übernehmen, class:"btn btn-lg btn-success"%>
+        <div class="row well">
+          <h2>
+            Belegung- und Planeinstellungen
+          </h2>
+          <div class=col-lg-6>
+            <%= f.submit :Übernehmen, class:"btn btn-lg btn-success"%>
+          </div>
+      <% end %>
+      <% end %>
+      <% if current_user.is_admin? %>
+
+          <div class=col-lg-6>
+            <%= link_to "Verfügbarkeiten ändern", semester_plan_path(@plan), {class: "btn btn-lg btn-primary"} %>
+          </div>
         </div>
-        <div class=col-lg-6>
-          <%= link_to "Verfügbarkeiten ändern", semester_plan_path(@plan), {class: "btn btn-lg btn-primary"} %>
-        </div>
-        <div class=col-lg-6>
-          <%= form_for("meeting", :url => {:controller => 'semester_plan_meetings', :action => 'create'}, method: "post") do |f| %>
-            <%= f.select "meeting_day", options_for_select(meeting_collection @scores, @plan) %>
+        <div class="row well">
+          <h2>
+            Weitere Einstellungen
+          </h2>
+          <div class=col-lg-6>
+            <%= form_for("meeting", :url => {:controller => 'semester_plan_meetings', :action => 'create'}, method: "post") do |f| %>
+              <%= f.select "meeting_day", options_for_select(meeting_collection @scores, @plan) %>
 
-            <%= f.submit "Meeting einstellen", class:"btn btn-lg btn-success"%>
+              <%= f.submit "Meeting einstellen", class:"btn btn-lg btn-success"%>
 
-          <% end %>
-        </div>
-        <div class=col-lg-6>
-          <%= form_for("save", :url => {:controller => 'semester_plan_manuals', :action => 'update'}, method: "patch") do |f| %>
+            <% end %>
+          </div>
+          <div class=col-lg-6>
+            <p>
+              <% if @fixed_solution %>
+                <% if @plan.compare_solutions(@fixed_solution, @solution) == @fixed_solution %>
+                  Neue Lösung ist nicht besser als gespeicherte Lösung.
+                  <br> gespeichert:<%=@plan.get_fitness_of_solution @fixed_solution %>
+                  <br> neue:<%=@plan.get_fitness_of_solution @solution %>)
+                <% else %>
+                  Neue Lösung ist besser als gespeicherte.
+                  <br> gespeichert:<%=@plan.get_fitness_of_solution @fixed_solution %>
+                  <br> neue:<%=@plan.get_fitness_of_solution @solution %>)
+                <% end %>
+              <% else %>
+                Bisher wurde keine Lösung gespeichert.
+                <br> neue:<%=@plan.get_fitness_of_solution @solution %>)
+              <% end %>
+            </p>
+            <%= form_for("save", :url => {:controller => 'semester_plan_manuals', :action => 'update'}, method: "patch") do |f| %>
 
-            <%= f.submit "Pland auerhaft speichern", class:"btn btn-lg btn-success"%>
+              <%= f.submit "Plan dauerhaft speichern", class:"btn btn-lg btn-success"%>
 
-          <% end %>
+            <% end %>
+          </div>
         </div>
       <% end %>
-    <% end %>
   </div>
 </div>
 

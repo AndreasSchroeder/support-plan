@@ -183,5 +183,22 @@ class SemesterPlan < ApplicationRecord
     end
   end
 
+  def compare_solutions sol1, sol2
+    fit1 = self.get_fitness_of_solution sol1
+    fit2 = self.get_fitness_of_solution sol2
+    if fit1 && fit2
+      if fit1[:fitness] > fit2[:fitness]
+        return sol1
+      elsif fit1[:fitness] < fit2[:fitness]
+        return sol2
+      elsif fit1[:unfitness] <= fit2[:unfitness]
+        return sol1
+      else
+        return sol2
+      end
+    end
+
+  end
+
 
 end

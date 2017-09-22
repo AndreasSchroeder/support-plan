@@ -7,7 +7,6 @@ class SemesterPlanManualsController < ApplicationController
     @plan = SemesterPlan.find(params[:id])
     p params["semester_plan"]
     @solution = eval(@plan.solution)
-    @fixed_solution = eval(@plan.fixed_solution)
 
     origin = eval(@plan.solution)
     params["semester_plan"].each do |key, value|
@@ -50,6 +49,7 @@ class SemesterPlanManualsController < ApplicationController
     @scores = @plan.best_meeting_dates
     @users = User.users_of_plan @plan
     @solution = eval(@plan.solution)
+    @fixed_solution = eval(@plan.fixed_solution)
 
 
   end
@@ -58,8 +58,12 @@ class SemesterPlanManualsController < ApplicationController
     @plan = SemesterPlan.find(params[:id])
     @solution = eval(@plan.solution)
     redirect_to valid_path(@plan)
+    p "Sol: #{@solution}"
     if @plan.update(fixed_solution: "#{@solution}")
-    @fixed_solution = eval(@plan.fixed_solution)
+      @fixed_solution = eval(@plan.fixed_solution)
+      p
+      p "fix: #{@plan.fixed_solution}"
+
       flash[:success] = "Neue Belegung für Plan gespeichert #{ @plan.get_fitness_of_solution @fixed_solution}."
     else
       flash[:success] = "Es ist ein Fehler aufgetreten."
