@@ -17,7 +17,7 @@
                                 <% if is_admin? %>
                                     <%= link_to "Benutzereinstellungen", users_path %>
                                 <% else %>
-                                    <%= link_to "Benutzer", users_path %>
+                                    <%= link_to "Benutzer", user_path(current_user) %>
 
                                 <% end %>
                                 </li>

@@ -1,12 +1,16 @@
 class UsersController < ApplicationController
     # filters
     before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy]
-    before_action :admin_user, only: [:index, :edit, :update, :destroy]
+    before_action :admin_user, only: [:index, :edit, :destroy]
 
   # lists all users
   def index
     @user = User.new
     @users = User.where(planable: true)
+  end
+
+  def show
+    @user = User.find(params[:id])
   end
 
   # for fill userdata
@@ -38,11 +42,36 @@ class UsersController < ApplicationController
     redirect_to action: :index
   end
 
+  def update
+    params["input"].each do |k, v|
+      id = k.split(";").first
+      type = k.split(";").last
+      value = v
+      p "#{id} #{type} #{value}"
+      user = User.find(id.to_i)
+      if type == "A"
+        user.update(is_admin: value.to_i)
+
+      else
+        user.update(hours: value.to_i)
+      end
+
+    end
+    flash[:success] = "Vorgang abgeschlossen."
+
+    redirect_back(fallback_location: root_path)
+  end
+
+
   private
 
   # whitelisteed params
   def question_params
     params.require(:user).permit(:email)
+  end
+
+  def question_params_update
+    params.require(:user).permit(:hours, :is_admin)
   end
 
   # Confirms a logged-in user.

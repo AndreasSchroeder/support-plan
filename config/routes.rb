@@ -14,10 +14,13 @@ Rails.application.routes.draw do
   patch   '/semester_plans/:id/valid', to: 'semester_plan_manuals#update', as: 'save'
   get    '/semester_plans/:id/meeting', to: 'semester_plan_meetings#show', as: 'meeting'
   post   '/semester_plans/:id/meeting', to: 'semester_plan_meetings#create'
+  patch '/users/', to: 'users#update'
+  post '/users/', to: 'users#create'
+  patch '/users/:id', to: 'users#update'
+  get '/users/:id', to: 'users#show'
+  get   'users/new'
 
-  get 'users/new'
-
-  resources :users,            only: [:destroy, :create, :index]
+  resources :users,            only: [:destroy, :index, :show]
   resources :semester_plans,   only: [:new, :create, :destroy, :show]
   resources :semester_break_plans,   only: [:new, :create, :destroy, :show]
 

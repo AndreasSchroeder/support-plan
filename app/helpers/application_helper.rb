@@ -65,4 +65,20 @@ module ApplicationHelper
     @collection
   end
 
+  def german_time time
+    if time
+      return time.strftime("%H:%M:%S Uhr, %d.%m.%Y")
+    else
+      return "Keine Zeit vorhanden"
+    end
+  end
+
+  def german_day time
+    if time
+      return time.strftime("%d.%m.%Y")
+    else
+      return "Keine Zeit vorhanden"
+    end
+  end
+
 end

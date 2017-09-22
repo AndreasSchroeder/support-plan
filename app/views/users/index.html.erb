@@ -12,33 +12,13 @@
         <%= render 'form' %>
       </div>
       <% if @users.any? %>
-        <%= form_for(:user, :url => {:controller => 'users', :action => 'create'}) do |f| %>
+        <%= form_for("input", :url => {:controller => 'users', :action => 'update'}, method: 'patch') do |f| %>
 
           <h3>
             Benutzer:
           </h3>
             <% @users.each do |user| %>
-              <div class="well col-md-6">
-                <p>
-                  <b>
-                    Name:
-                  </b>
-                  <%= "#{user.get_name}" %>
-                </p>
-                <p>
-                  <b>
-                    Email:
-                  </b>
-                  <%= "#{user.email} " %>
-                </p>
-                <p>
-                  <b>
-                    Stunden:
-                  </b>
-                  <%= "#{user.email} " %>
-                </p>
-                <%= link_to "Nutzer löschen", user,  method: :delete, data: { confirm: "Soll dieser Benutzer wirklich entfernt werden?" } %>
-              </div>
+              <%= render "user_info", user: user, f: f %>
             <% end %>
         <%= f.submit :Speichern, class:"btn btn-lg btn-primary"%>
       <% end %>
@@ -46,3 +26,4 @@
   <% end %>
 
 </div>
+

@@ -1,0 +1,11 @@
+
+<div class="Benutzer">
+  <h1>Benutzerverwaltung</h1>
+  <div class="row well">
+    <%= form_for("input", :url => {:controller => 'users', :action => 'update'}, method: 'patch') do |f| %>
+          <%= render "user_info", user: @user, f: f %>
+      <%= f.submit :Speichern, class:"btn btn-lg btn-primary"%>
+    <% end %>
+  </div>
+
+</div>

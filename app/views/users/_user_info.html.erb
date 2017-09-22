@@ -1,0 +1,44 @@
+<div class="well col-md-6">
+  <p>
+    <b>
+      Name:
+    </b>
+    <%= "#{user.get_name}" %>
+  </p>
+  <p>
+    <b>
+      Email:
+    </b>
+    <%= "#{user.email} " %>
+  </p>
+  <p>
+    <b>
+      Stunden:
+    </b>
+    <%= f.number_field "#{user.id};H", value: user.hours %>
+  </p>
+  <% if is_admin? %>
+    <div class="col-md-6">
+      <p>
+        <b>
+          Ist Admin?
+        </b>
+        <%= f.check_box "#{user.id};A", checked: user.is_admin %>
+      </p>
+    </div>
+    <div class="col-md-6">
+      <%= link_to "Nutzer löschen", user,  method: :delete, data: { confirm: "Soll dieser Benutzer wirklich entfernt werden?" } , class: "btn btn-lg btn-danger"%>
+    </div>
+  <% end %>
+    <div class="col-md-12">
+
+  <p>
+    <b>
+      Zulezt angemeldet:
+    </b>
+  </p>
+  <p>
+      <%= german_time user.last_login %>
+  </p>
+</div>
+</div>

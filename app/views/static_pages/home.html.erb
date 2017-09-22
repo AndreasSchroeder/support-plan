@@ -22,11 +22,22 @@
           <h4>
             <%= link_to "#{plan.name}" , semester_plan_path(plan.id) %>
           </h4>
+          <% if plan.meeting_day %>
+            <p>
+              <%= "Treffen #{plan.meeting_day} um #{plan.meeting_time}:00Uhr." %>
+            </p>
+          <% else %>
+            <p>
+              <%= "Treffen noch nicht festgelegt." %>
+            </p>
+          <% end %>
           <p>
-            Start: <%= plan.start %>
-            End: <%= plan.end %>
+            Start: <%= german_day plan.start %>
           </p>
-          <% if plan.solution != nil %>
+          <p>
+            Ende: <%= german_day plan.end %>
+          </p>
+          <% if plan.fixed_solution != nil %>
             <h4>
               <%= link_to "Einteilung" , valid_path(plan.id) %>
             </h4>

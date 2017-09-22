@@ -113,7 +113,15 @@
   <% end %>
 </table>
   <% if current_user.planable || is_admin? %>
-    <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
+    <div class ="col-md-6" >
+      <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>
+    </div>
+  <% end %>
+  <% if @plan.fixed_solution %>
+    <div class ="col-md-6" >
+      <%= link_to "Einteilung anschauen", valid_path(@plan), class:"btn btn-lg btn-success" %>
+    </div>
+
   <% end %>
 <% end %>
 
@@ -143,6 +151,7 @@
         <div class ="col-md-6" >
           <%= f.submit "Plan erstellen", class:"btn btn-lg btn-success"%>
         </div>
+
       <% end %>
     <% end %>
   </div>
