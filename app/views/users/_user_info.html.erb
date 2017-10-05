@@ -27,6 +27,14 @@
       </p>
     </div>
     <div class="col-md-6">
+      <p>
+        <b>
+          Ist Planbar?
+        </b>
+        <%= f.check_box "#{user.id};P", checked: user.planable %>
+      </p>
+    </div>
+    <div class="col-md-6">
       <%= link_to "Nutzer löschen", user,  method: :delete, data: { confirm: "Soll dieser Benutzer wirklich entfernt werden?" } , class: "btn btn-lg btn-danger"%>
     </div>
   <% end %>

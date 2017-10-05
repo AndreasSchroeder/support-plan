@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   # lists all users
   def index
     @user = User.new
-    @users = User.where(planable: true)
+    @users = User.where(inactive: false)
   end
 
   def show
@@ -37,7 +37,7 @@ class UsersController < ApplicationController
 
   # action for deleting
   def destroy
-    User.find(params[:id]).update(planable: false)
+    User.find(params[:id]).update(inactive: true)
     flash[:success] = "Benutzer wurde gelöscht"
     redirect_to action: :index
   end
@@ -49,12 +49,16 @@ class UsersController < ApplicationController
       value = v
       p "#{id} #{type} #{value}"
       user = User.find(id.to_i)
+      p user
+      p
       if type == "A"
         user.update(is_admin: value.to_i)
-
-      else
+      elsif type == "H"
         user.update(hours: value.to_i)
+      elsif type == "P"
+        user.update(planable: value.to_i)
       end
+      p user
 
     end
     flash[:success] = "Vorgang abgeschlossen."
@@ -71,7 +75,7 @@ class UsersController < ApplicationController
   end
 
   def question_params_update
-    params.require(:user).permit(:hours, :is_admin)
+    params.require(:user).permit(:hours, :is_admin, :planable)
   end
 
   # Confirms a logged-in user.

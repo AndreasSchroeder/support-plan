@@ -37,7 +37,7 @@ class User < ApplicationRecord
         end
       end
     end
-    return self.planable
+    return (self.planable != self.inactive ) && ! inactive
   end
 
   def self.users_of_plan plan
