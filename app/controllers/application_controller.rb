@@ -61,6 +61,10 @@ class ApplicationController < ActionController::Base
         if array.last.downcase == "uni-osnabrueck.de" || array.last.downcase == "uos.de"
             mail = array.first + "@uni-osnabrueck.de"
             @user = User.find_by(email: mail)
+            if !@user
+                mail = array.first + "@uos.de"
+            end
+
             return mail.downcase
         else
             return email.downcase
