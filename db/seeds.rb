@@ -8,8 +8,8 @@
 
 ran = Random.new
 
-User.create(email: "andschroeder@uos.de", is_admin: true, first_name: "andi", last_name: "schroeder", hours: 40)
 User.create(email: "admin@admintest.de", is_admin: true, first_name: "admin", planable: false)
+User.create(email: "andschroeder@uos.de", is_admin: true, first_name: "andi", last_name: "schroeder", hours: 40)
 9.times do |n|
   User.create(first_name: "Jack#{n}",last_name: "#{n}", email: "jack#{n}@uos.de", hours: 30)
 end
