@@ -4,6 +4,6 @@ class StaticPagesController < ApplicationController
     if !logged_in?
       redirect_to login_path
     end
-    @plans = SemesterPlan.all
+    @plans = SemesterPlan.where(inactive: false)
   end
 end

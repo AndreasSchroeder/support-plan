@@ -43,6 +43,7 @@
             </h4>
 
           <% end %>
+          <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-lg btn-danger" %>
         </div>
       <% end %>
     </div>

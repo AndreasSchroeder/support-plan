@@ -36,9 +36,9 @@ class SemesterPlansController < ApplicationController
   end
 
   def destroy
-    SemesterPlan.find(params[:id]).update(deleted: false)
+    SemesterPlan.find(params[:id]).update(inactive: true)
     flash[:success] = "Plan wurde gelöscht"
-    redirect_to action: :index
+    redirect_to root_path
   end
 
 

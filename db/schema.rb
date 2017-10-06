@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171005113052) do
+ActiveRecord::Schema.define(version: 20171006063314) do
 
   create_table "day_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.date     "start"
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(version: 20171005113052) do
     t.string   "meeting_day"
     t.integer  "meeting_time"
     t.text     "fixed_solution", limit: 65535
+    t.boolean  "inactive",                     default: false
   end
 
   create_table "time_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
