@@ -62,7 +62,7 @@
           <% all_hours = @users.inject(0){|sum, x| sum +x.hours.to_i} %>
           <% @users.each do |user| %>
             <th>
-              <div title=<%= "#{user.get_name}" %>>
+              <div title=<%= "#{user.get_name_or_alias}" %>>
                 <%= '%.2f' %(20 *user.hours.to_f/all_hours) %>
               </div>
             </th>
@@ -84,14 +84,14 @@
             </td>            <% if !current_user.is_admin? %>
               <% if slot[:user] != nil %>
                 <td  class=<%=get_av slot, false  %>>
-                  <%= User.find(slot[:user].to_i).get_name %>
+                  <%= User.find(slot[:user].to_i).get_name_or_alias %>
                 </td>
               <% else %>
                 <td></td>
               <% end %>
               <% if slot[:co] != nil %>
                 <td  class=<%= get_av slot, true %>>
-                  <%= User.find(slot[:co].to_i).get_name %>
+                  <%= User.find(slot[:co].to_i).get_name_or_alias %>
                 </td>
               <% else %>
                 <td></td>
@@ -106,7 +106,7 @@
             <% end %>
 
             <% @users.each do |user| %>
-              <td title=<%="#{user.get_name}"%> class=<%=get_av_user_slot user, TimeSlot.find(slot[:slot].to_i)%> >
+              <td title=<%="#{user.get_name_or_alias}"%> class=<%=get_av_user_slot user, TimeSlot.find(slot[:slot].to_i)%> >
 
               </td>
             <% end %>

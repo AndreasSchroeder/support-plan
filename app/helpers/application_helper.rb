@@ -6,14 +6,14 @@ module ApplicationHelper
     @users.each do |user|
       if s[:user].to_i == user.id && !co
         selected = true
-        @collection << [user.get_name, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}", selected: "" }]
+        @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}", selected: "" }]
       elsif s[:co].to_i == user.id && co
         selected = true
-        @collection << [user.get_name, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}", selected: "" }]
+        @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}", selected: "" }]
       elsif s[:slot]
-        @collection << [user.get_name, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}" }]
+        @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}" }]
       else
-        @collection << [user.get_name, user.id]
+        @collection << [user.get_name_or_alias, user.id]
       end
     end
     if !selected
