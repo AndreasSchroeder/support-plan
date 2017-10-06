@@ -1,117 +1,114 @@
 <h1><%=@plan.name%></h1>
 
 
-
-<table class="table-hover table-bordered table">
-  <tr>
-    <th rowspan="3">
-      Angestellte
-    </th>
-    <th rowspan="3">
-      Stunden
-    </th>
-    <th colspan=<%=@plan.time_slots.length%>>
-      Zeit
-    </th>
-  </tr>
-  <tr>
-
-    <% ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"].each do |day| %>
-      <th colspan=4>
-      <%= day %>
-      </th>
-    <% end %>
-  </tr>
-  <tr>
-
-    <% 5.times do  %>
-      <% ["8:00", "10:00", "12:00", "14:00"].each do |time| %>
-        <th>
-          <%= time %>
-        </th>
-      <% end %>
-    <% end %>
-  </tr>
 <%= form_for("connections", :url => {:controller => 'semester_plans', :action => 'handle'}) do |f| %>
 
-  <% @users.each do |user| %>
+  <table class="table-hover table-bordered table">
     <tr>
-      <td>
-        <%= "#{user.first_name} #{user.last_name}" %>
-      </td>
-      <td>
+      <th rowspan="3">
+        Angestellte
+      </th>
+      <th rowspan="3">
+        Stunden
+      </th>
+      <th colspan=<%=@plan.time_slots.length%>>
+        Zeit
+      </th>
+    </tr>
+    <tr>
+      <% ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"].each do |day| %>
+        <th colspan=4>
+          <%= day %>
+        </th>
+      <% end %>
+    </tr>
+    <tr>
+      <% 5.times do  %>
+        <% ["8:00", "10:00", "12:00", "14:00"].each do |time| %>
+          <th>
+            <%= time %>
+          </th>
+        <% end %>
+      <% end %>
+    </tr>
 
-        <%= "#{user.hours}" %>
-      </td>
+    <% @users.each do |user| %>
+      <tr>
+        <td>
+          <%= "#{user.first_name} #{user.last_name}" %>
+        </td>
+        <td>
+          <% if user.hours && user.hours >0 %>
+            <%= "#{user.hours}" %>
+          <% elsif current_user == user %>
+            <%= link_to "einstellen", user_path(user), class: "btn btn-sm btn-primary" %>
+          <% end %>
+        </td>
         <%@plan.time_slots.each_with_index do |slot, index| %>
           <% av = SemesterPlanConnection.find_it(user, slot).availability %>
           <% if index == SemesterPlanConnection.find_it(user, slot).typus %>
 
             <% if (current_user == user && @plan.free? || current_user.is_admin?)  %>
               <% case av
-                  when 0
-                  %>
-                    <td class="av0">
-              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                    </td>
-                  <%
-                  when 1
-                  %>
-                    <td class=av1>
-              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                    </td>
-                  <%
-                  when 2
-                  %>
-                    <td class=av2>
-              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                    </td>
-                  <%
-                  when 3
-                  %>
-                    <td class=av3>
-              <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
-                    </td>
-                  <%
-                  end%>
+              when 0
+              %>
+               <td class="av0">
+                <%= f.text_field "#{user.id};#{slot.id}", value:  SemesterPlanConnection.find_it(user, slot).availability%>
+                </td>
+              <%
+              when 1
+              %>
+                <td class=av1>
+                  <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                </td>
+              <%
+              when 2
+              %>
+                <td class=av2>
+                  <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                </td>
+              <%
+              when 3
+              %>
+                <td class=av3>
+                  <%= f.text_field "#{user.id};#{slot.id}", value: SemesterPlanConnection.find_it(user, slot).availability%>
+                </td>
+              <%end%>
 
             <% else %>
               <% case av
-                  when 0
-                  %>
-                    <td class="av0">
-                    <p>
+              when 0
+              %>
+                <td class="av0">
+                  <p>
                     <%= av %>
-                    </p>
-                    </td>
-                  <%
-                  when 1
-                  %>
-                    <td class=av1>
-                    <%= av %>
-                    </td>
-                  <%
-                  when 2
-                  %>
-                    <td class=av2>
-                    <%= av %>
-                    </td>
-                  <%
-                  when 3
-                  %>
-                    <td class=av3>
-                    <%= av %>
-                    </td>
-                  <%
-                  end%>
+                  </p>
+                </td>
+              <%
+              when 1
+              %>
+                <td class=av1>
+                  <%= av %>
+                </td>
+              <%
+              when 2
+              %>
+                <td class=av2>
+                  <%= av %>
+                </td>
+              <%
+              when 3
+              %>
+                <td class=av3>
+                  <%= av %>
+                </td>
+              <% end %>
             <% end %>
-          <%else %>
-            ERROR!!!!!!!!!!!!!!!!!!!!
           <% end %>
         <% end %>
-    </tr>
-  <% end %>
-</table>
+      </tr>
+    <% end %>
+  </table>
   <% if current_user.planable || is_admin? %>
     <div class ="col-md-6" >
       <%= f.submit :Übernehmen, class:"btn btn-lg btn-primary"%>

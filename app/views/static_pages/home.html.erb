@@ -42,11 +42,11 @@
               <%= link_to "Einteilung" , valid_path(plan.id) %>
             </h4>
 
-            <% end %>
+          <% end %>
           <% if is_admin? %>
             <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-lg btn-danger" %>
-          </div>
-        <% end %>
+          <% end %>
+        </div>
       <% end %>
     </div>
   <% end %>
