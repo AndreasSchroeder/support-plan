@@ -18,7 +18,7 @@
           </th>
           <% @users.each do |user| %>
             <th>
-              <div title=<%= "#{user.get_name}" %>>
+              <div title=<%= "#{user.get_name_or_alias}" %>>
                 <%= user.get_initial %>
               </div>
             </th>
@@ -33,7 +33,7 @@
           </th>
           <% @users.each do |user| %>
             <th>
-              <div title=<%= "#{user.get_name}" %>>
+              <div title=<%= "#{user.get_name_or_alias}" %>>
                 <%= user.hours %>
                 </div>
             </th>
@@ -48,7 +48,7 @@
           </th>
           <% @users.each do |user| %>
             <th>
-              <div title=<%= "#{user.get_name}" %>>
+              <div title=<%= "#{user.get_name_or_alias}" %>>
                 <%= @plan.get_amount_of_shifts_in_solution user %>
               </div>
             </th>
