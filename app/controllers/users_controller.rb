@@ -37,7 +37,7 @@ class UsersController < ApplicationController
 
   # action for deleting
   def destroy
-    User.find(params[:id]).update(inactive: true)
+    User.find(params[:id]).update(inactive: true, planable: false)
     flash[:success] = "Benutzer wurde gelöscht"
     redirect_to action: :index
   end

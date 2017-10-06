@@ -35,7 +35,7 @@
     <% @users.each do |user| %>
       <tr>
         <td>
-          <%= "#{user.first_name} #{user.last_name}" %>
+          <%= "#{user.get_name_or_alias}" %>
         </td>
         <td>
           <% if user.hours && user.hours >0 %>

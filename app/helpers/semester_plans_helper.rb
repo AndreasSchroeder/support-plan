@@ -26,10 +26,12 @@ module SemesterPlansHelper
           plan.update(solution: empty_slots)
         end
         flash[:success] = " Manuelle Planerstellung eingeleitet"
-          redirect_to valid_path User.find(params[:id])
+          redirect_to valid_path User.find(params[:id]), show_new: true
       when "1"
         flash[:success] = " Gültiger Plan wurde erstellt."
-        plan.update(solution: "#{mutate_pairs(plan, valid_solution2(false))}")
+        sol = valid_solution2(false)
+        p "plan: #{sol}"
+        plan.update(solution: "#{mutate_pairs(plan, sol)}")
 
         if feasible plan.solution
           plan.update(solution: "#{valid_solution2(true)}")
@@ -147,39 +149,34 @@ module SemesterPlansHelper
 
   def mutate_pairs plan, child
     origin = child.clone
-    p " origin: #{plan.get_fitness_of_solution origin} #{origin}"
     elem0 = nil
     elem1 = nil
     19.times do |n|
       elem0 = child[n]
       elem1 = child[n + 1]
       if elem0[:user] != elem1[:user]
+        p "elem0: #{elem0}"
+        p "elem1: #{elem1}"
          users0 = TimeSlot.find(elem0[:slot]).get_users 1
          users1 = TimeSlot.find(elem1[:slot]).get_users 1
          if users1.detect{|x| x.to_i == elem0[:user].to_i}
           slots = plan.get_slots_of_user_av1 child, elem0[:user], elem1[:user], elem0[:slot], elem1[:slot]
           if slots.any?
-            p "write #{elem0[:user]} (#{n}) to  #{elem1[:user]} (#{n+1})"
             slot = slots.shuffle.first
-            p "swrite #{elem1[:user]} (#{n+1}) to #{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user]} (#{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:index]})"
 
             child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user] = elem1[:user].to_i
             child[n + 1][:user] = elem0[:user].to_i
-            p " child: #{plan.get_fitness_of_solution child} #{child}"
           end
         elsif users0.detect{|x| x.to_i == elem1[:user].to_i}
           slots = plan.get_slots_of_user_av1 child, elem1[:user], elem0[:user], elem1[:slot], elem0[:slot]
           if slots.any?
-            p "write2 #{elem1[:user]} (#{n}) to  #{elem0[:user]} (#{n+1})"
             slot = slots.shuffle.first
-            p "swrite2 #{elem0[:user]} (#{n+1}) to #{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user]} (#{child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:index]})"
             child.detect{|x| x[:slot].to_i == slot.id.to_i}[:user] = elem0[:user].to_i
             child[n][:user] = elem1[:user].to_i
           end
         end
       end
     end
-    p " child: #{plan.get_fitness_of_solution child} #{child}"
 
     (sort_soluitons(plan, [child, origin])).first
 

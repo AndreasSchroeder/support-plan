@@ -20,7 +20,7 @@
       <% @plans.each do |plan| %>
         <div class="col-md-6 well">
           <h4>
-            <%= link_to "#{plan.name}" , semester_plan_path(plan.id) %>
+            <%= link_to "#{plan.name}" , semester_plan_path(plan.id), class: "btn btn-sm btn-primary" %>
           </h4>
           <% if plan.meeting_day %>
             <p>
@@ -39,12 +39,12 @@
           </p>
           <% if plan.fixed_solution != nil %>
             <h4>
-              <%= link_to "Einteilung" , valid_path(plan.id) %>
+              <%= link_to "Einteilung" , valid_path(plan.id), class: "btn btn-sm btn-success" %>
             </h4>
 
           <% end %>
           <% if is_admin? %>
-            <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-lg btn-danger" %>
+            <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-sm btn-danger" %>
           <% end %>
         </div>
       <% end %>

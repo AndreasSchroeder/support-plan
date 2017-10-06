@@ -119,7 +119,7 @@ class SemesterPlan < ApplicationRecord
   end
 
   def get_user_priority
-    users = User.where(planable: true)
+    users = User.where(planable: true, inactive: false)
     slots = self.time_slots
 
     priority = []
@@ -148,8 +148,11 @@ class SemesterPlan < ApplicationRecord
     slot0 = s0.to_i
     slot1 = s1.to_i
     self.time_slots.each do |slot|
-      if solution.detect{|x| x[:slot].to_i == slot.id.to_i}[:user].to_i == u0.to_i && SemesterPlanConnection.find_it_id(user1.id, slot.id).availability == 1 && SemesterPlanConnection.find_it_id(user0.id, slot1).availability == 1 && slot.id.to_i != slot1.to_i && slot.id.to_i != slot0.to_i
-        slots << slot
+      found = solution.detect{|x| x[:slot].to_i == slot.id.to_i}
+      if found
+        if  found[:user].to_i == u0.to_i && SemesterPlanConnection.find_it_id(user1.id, slot.id).availability == 1 && SemesterPlanConnection.find_it_id(user0.id, slot1).availability == 1 && slot.id.to_i != slot1.to_i && slot.id.to_i != slot0.to_i
+          slots << slot
+        end
       end
     end
     slots

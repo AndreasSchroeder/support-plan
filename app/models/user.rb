@@ -20,6 +20,14 @@ class User < ApplicationRecord
     end
   end
 
+  def get_name_or_alias
+    if self.first_name.nil?
+      return "#{self.email.split('@').first}"
+    else
+      return "#{self.first_name} #{self.last_name}"
+    end
+  end
+
   def get_initial
     if self.first_name.nil? || self.last_name.nil?
       return "11"
@@ -32,12 +40,13 @@ class User < ApplicationRecord
   def is_planable? plan
     plan.time_slots.each do |slot|
       slot.semester_plan_connections.each do |con|
+        p "user: #{con.user.get_name}"
         if con.user == self
           return true
         end
       end
     end
-    return (self.planable != self.inactive ) && ! inactive
+    return self.planable
   end
 
   def self.users_of_plan plan
@@ -80,7 +89,7 @@ class User < ApplicationRecord
     rnd = Random.new
     # initialize and fill
     shifts = []
-    User.where(planable: true).each do |user|
+    User.where(planable: true, inactive: false).each do |user|
       shifts << {user: user.id, shifts: user.get_shifts_round}
     end
     # sum up
