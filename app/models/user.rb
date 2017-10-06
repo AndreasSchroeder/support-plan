@@ -20,6 +20,29 @@ class User < ApplicationRecord
     end
   end
 
+  def unplanable
+    SemesterPlan.all.each do |plan|
+      all_empty = true
+      plan.time_slots.each do |slot|
+        slot.semester_plan_connections.each do |con|
+
+          if con.availability != 0 && con.user == self
+            all_empty = false
+          end
+        end
+      end
+      if all_empty
+        plan.time_slots.each do |slot|
+          slot.semester_plan_connections.each do |con|
+            if con.user == self
+              con.delete
+            end
+          end
+        end
+      end
+    end
+  end
+
   def get_name_or_alias
     if self.first_name.nil?
       return "#{self.email.split('@').first}"
