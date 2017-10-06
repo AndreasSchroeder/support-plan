@@ -79,7 +79,29 @@ class User < ApplicationRecord
         users << user
       end
     end
-    users
+    User.all.each do |user|
+      if user.office
+        users << user
+      end
+    end
+    users.uniq
+  end
+
+  def self.users_of_plan_without_office plan
+    users = []
+    User.all.each do |user|
+      if user.is_planable? plan
+        users << user
+      end
+    end
+    without =[]
+    User.all.each do |user|
+      if user.office
+        without << user
+      end
+    end
+
+    users.uniq - without.uniq
   end
 
   # returns the sum of all hours of planable users

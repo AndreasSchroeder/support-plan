@@ -48,6 +48,7 @@ class SemesterPlanManualsController < ApplicationController
     @users = []
     @scores = @plan.best_meeting_dates
     @users = User.users_of_plan @plan
+    @users_tec = User.users_of_plan_without_office @plan
     @solution = eval(@plan.solution)
     if @plan.fixed_solution
 

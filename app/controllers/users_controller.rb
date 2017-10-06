@@ -38,7 +38,7 @@ class UsersController < ApplicationController
   # action for deleting
   def destroy
     user = User.find(params[:id])
-    user.update(inactive: true, planable: false)
+    user.update(inactive: true, planable: false, office: false)
     user.unplanable
     flash[:success] = "Benutzer wurde gelöscht"
     redirect_to action: :index
@@ -49,21 +49,19 @@ class UsersController < ApplicationController
       id = k.split(";").first
       type = k.split(";").last
       value = v
-      p "#{id} #{type} #{value}"
       user = User.find(id.to_i)
-      p user
-      p
       if type == "A"
         user.update(is_admin: value.to_i)
       elsif type == "H"
         user.update(hours: value.to_i)
+      elsif type == "V"
+        user.update(office: value.to_i)
       elsif type == "P"
         user.update(planable: value.to_i)
-        if !user.planable
-          user.unplanable
-        end
       end
-      p user
+      if !user.planable && !user.office
+        user.unplanable
+      end
 
     end
     flash[:success] = "Vorgang abgeschlossen."

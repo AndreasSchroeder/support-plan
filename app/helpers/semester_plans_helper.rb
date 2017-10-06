@@ -30,7 +30,6 @@ module SemesterPlansHelper
       when "1"
         flash[:success] = " Gültiger Plan wurde erstellt."
         sol = valid_solution2(false)
-        p "plan: #{sol}"
         plan.update(solution: "#{mutate_pairs(plan, sol)}")
 
         if feasible plan.solution
@@ -155,8 +154,6 @@ module SemesterPlansHelper
       elem0 = child[n]
       elem1 = child[n + 1]
       if elem0[:user] != elem1[:user]
-        p "elem0: #{elem0}"
-        p "elem1: #{elem1}"
          users0 = TimeSlot.find(elem0[:slot]).get_users 1
          users1 = TimeSlot.find(elem1[:slot]).get_users 1
          if users1.detect{|x| x.to_i == elem0[:user].to_i}

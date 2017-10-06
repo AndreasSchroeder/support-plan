@@ -1,9 +1,9 @@
 module ApplicationHelper
     def get_collection s, co, plan
     @collection = []
-    @users = User.users_of_plan plan
+    users = User.users_of_plan_without_office plan
     selected = false
-    @users.each do |user|
+    users.each do |user|
       if s[:user].to_i == user.id && !co
         selected = true
         @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}", selected: "" }]

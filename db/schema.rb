@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171006063314) do
+ActiveRecord::Schema.define(version: 20171006122209) do
 
   create_table "day_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.date     "start"
@@ -87,6 +87,7 @@ ActiveRecord::Schema.define(version: 20171006063314) do
     t.integer  "hours"
     t.datetime "last_login"
     t.boolean  "inactive",   default: false
+    t.boolean  "office",     default: false
   end
 
   add_foreign_key "day_slots", "semester_break_plans"

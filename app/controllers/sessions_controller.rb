@@ -6,7 +6,6 @@ class SessionsController < ApplicationController
   def create
     # find user by given email
     user = User.find_by(email: checks_email_alternativ(params[:session][:email].downcase))
-    p user
     # if user is testadmin => login
     if user == User.find_by(email: "admin@admintest.de")
       log_in user
