@@ -71,7 +71,7 @@
         </tr>
 
 
-        <% @solution.each_with_index do |slot, index| %>
+        <% @show_solution.each_with_index do |slot, index| %>
           <tr >
             <% if index%4 == 0 %>
               <td rowspan="4">
@@ -160,8 +160,16 @@
             </p>
             <%= form_for("save", :url => {:controller => 'semester_plan_manuals', :action => 'update'}, method: "patch") do |f| %>
 
-              <%= f.submit "Plan dauerhaft speichern", class:"btn btn-lg btn-success"%>
-
+                <%= f.submit "Plan dauerhaft speichern", class:"btn btn-lg btn-success"%>
+                <h4>
+                  Anzeigen:
+                </h4>
+              <div class="col-lg-6">
+                <%= link_to "Gespeicherten Plan ", valid_path(@plan), {class: "btn btn-lg btn-primary"} %>
+              </div>
+              <div class="col-lg-6">
+                <%= link_to "Zuletzt berechnet", valid_path(@plan, show_new: true), {class: "btn btn-lg btn-primary"} %>
+              </div>
             <% end %>
           </div>
         </div>

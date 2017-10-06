@@ -34,14 +34,14 @@ module SemesterPlansHelper
         if feasible plan.solution
           plan.update(solution: "#{valid_solution2(true)}")
         end
-        redirect_to valid_path User.find(params[:id])
+        redirect_to valid_path User.find(params[:id]), show_new: true
       when "2"
         plan.update(solution: "#{heuristic (plan)}")
         if feasible plan.solution
           plan.update(solution: "#{valid_solution2 true}")
         end
         flash[:success] = " 2 verlinkt!"
-        redirect_to valid_path User.find(params[:id])
+        redirect_to valid_path User.find(params[:id]), show_new: true
     end
   end
 

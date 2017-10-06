@@ -5,7 +5,6 @@ class SemesterPlanManualsController < ApplicationController
 
   def create
     @plan = SemesterPlan.find(params[:id])
-    p params["semester_plan"]
     @solution = eval(@plan.solution)
 
     origin = eval(@plan.solution)
@@ -39,12 +38,13 @@ class SemesterPlanManualsController < ApplicationController
     else
       flash[:warning] = "Support und Co-Supporter müssen sich unterscheiden!Betroffene Zeilen nicht übernommen."
     end
-    redirect_to valid_path(@plan)
+    redirect_to valid_path(@plan, show_new: true)
   end
 
   # action for showing a valid solution
   def show
     @plan = SemesterPlan.find(params[:id])
+
     @users = []
     @scores = @plan.best_meeting_dates
     @users = User.users_of_plan @plan
@@ -55,18 +55,19 @@ class SemesterPlanManualsController < ApplicationController
     else
       @fixed_solution = nil
     end
-
+    if params[:show_new]
+      @show_solution = @solution
+    else
+      @show_solution =@fixed_solution
+    end
   end
 
   def update
     @plan = SemesterPlan.find(params[:id])
     @solution = eval(@plan.solution)
     redirect_to valid_path(@plan)
-    p "Sol: #{@solution}"
     if @plan.update(fixed_solution: "#{@solution}")
       @fixed_solution = eval(@plan.fixed_solution)
-      p
-      p "fix: #{@plan.fixed_solution}"
 
       flash[:success] = "Neue Belegung für Plan gespeichert #{ @plan.get_fitness_of_solution @fixed_solution}."
     else
