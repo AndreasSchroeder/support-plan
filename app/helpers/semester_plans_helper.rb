@@ -82,7 +82,7 @@ module SemesterPlansHelper
 
   def heuristic plan
     solutions = start_solution plan
-    5.times do
+    10.times do
       parents = selection plan, solutions
       solutions << generate_child_solution(plan, parents)
       solutions = sort_soluitons(plan, solutions).first(25)
@@ -183,12 +183,12 @@ module SemesterPlansHelper
   # Calculates 20 Start solutions
   def start_solution plan
     solutions = []
-    10.times do
+    15.times do
       s =  mutate_pairs plan, valid_solution2(false)
       solutions << s
     end
 
-    #10.times do
+    #0.times do
     #  s = random_solution plan
     #end
 
