@@ -22,11 +22,14 @@ class SemesterBreakPlansController < ApplicationController
   # POST /semester_break_plans
   def create
     @semester_break_plan = SemesterBreakPlan.new(semester_break_plan_params)
-
+    @users = User.users_of_break_plan @semester_break_plan
     if @semester_break_plan.save
       days = DaySlot.days_between @semester_break_plan.start, @semester_break_plan.end
       days.each do |day|
-        @semester_break_plan.day_slots.create(start: parse_day(day))    
+        slot = @semester_break_plan.day_slots.create(start: parse_day(day))
+        @users.each do |user|
+          slot.semester_break_plan_connections.create(user: user)
+        end    
       end
       flash[:success] = "Ferien-Support-Plan angelegt."
       redirect_to @semester_break_plan 
@@ -61,10 +64,11 @@ class SemesterBreakPlansController < ApplicationController
         slot.delete_if_holiday
       end
       @slots = @semester_break_plan.day_slots
+      @users = User.users_of_break_plan @semester_break_plan
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def semester_break_plan_params
-      params.require(:semester_break_plan).permit(:start, :end, :name, :free, :solution)
+      params.require(:semester_break_plan).permit(:start, :end, :name, :free, :solution, day_slots_attributes: [:semester_break_plan_id, :id, semester_break_plan_connections_attributes:[:id, :availability, :user_id, :day_slot_id]])
     end
 end

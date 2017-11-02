@@ -71,10 +71,36 @@ class User < ApplicationRecord
     return self.planable
   end
 
+  def is_planable_break? plan
+    plan.day_slots.each do |slot|
+      slot.semester_break_plan_connections.each do |con|
+        if con.user == self
+          return true
+        end
+      end
+    end
+    return self.planable
+  end
+
   def self.users_of_plan plan
     users = []
     User.all.each do |user|
       if user.is_planable? plan
+        users << user
+      end
+    end
+    User.all.each do |user|
+      if user.office
+        users << user
+      end
+    end
+    users.uniq
+  end
+
+  def self.users_of_break_plan plan
+    users = []
+    User.all.each do |user|
+      if user.is_planable_break? plan
         users << user
       end
     end

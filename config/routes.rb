@@ -24,7 +24,7 @@ Rails.application.routes.draw do
 
   resources :users,            only: [:destroy, :index, :show]
   resources :semester_plans,   only: [:new, :create, :destroy, :show]
-  resources :semester_break_plans,   only: [:new, :create, :destroy, :show]
+  resources :semester_break_plans,   only: [:new, :create, :destroy, :edit, :update, :show]
   resources :holidays
 
 end
