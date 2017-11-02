@@ -1,2 +1,34 @@
-<h1>SemesterBreakPlans#show</h1>
-<p>Find me in app/views/semester_break_plans/show.html.erb</p>
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Startdatum:</strong>
+  <%= german_day @semester_break_plan.start %>
+</p>
+
+<p>
+  <strong>Enddatum:</strong>
+  <%= german_day @semester_break_plan.end %>
+</p>
+
+<p>
+  <strong>Bezeichnung:</strong>
+  <%= @semester_break_plan.name %>
+</p>
+
+
+<div class="table-responsive">
+  <table class="table table-hover table-bordered">
+    <tr>
+      <th colspan=1>Optionen</th>
+      <th colspan=1>Datum</th>
+
+    </tr>
+    <% @slots.each do |slot| %>
+      <tr>
+        <td><%= link_to 'Feiertag/Brückentag',  {:controller => "day_slots", :action => 'destroy', :id => slot.id, plan_id: @semester_break_plan.id}, :confirm => "Sind Sie sicher?", :method => :delete, class: "btn btn-sm btn-warning"  %></td>
+        <td> <%= german_day slot.start %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

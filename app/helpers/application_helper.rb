@@ -81,4 +81,12 @@ module ApplicationHelper
     end
   end
 
+  def parse_day time
+    if time
+      return time.strftime("%Y-%m-%d")
+    else
+      return "Keine Zeit vorhanden"
+    end
+  end
+
 end

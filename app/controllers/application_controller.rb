@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   include SessionsHelper
+  include ApplicationHelper
 
       # conect to LDAP servers and update the given user. This method will be called if a login occured with an @uos.de or @uni-osnabrueck.de
     # adresse

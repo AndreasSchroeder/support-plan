@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  delete '/day_slots/:id/destroy', to: 'day_slots#destroy'
+
   get 'semester_break_plans/index'
 
   get 'semester_break_plans/show'
@@ -23,5 +25,6 @@ Rails.application.routes.draw do
   resources :users,            only: [:destroy, :index, :show]
   resources :semester_plans,   only: [:new, :create, :destroy, :show]
   resources :semester_break_plans,   only: [:new, :create, :destroy, :show]
+  resources :holidays
 
 end

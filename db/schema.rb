@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171006122209) do
+ActiveRecord::Schema.define(version: 20171102074458) do
 
   create_table "day_slots", force: :cascade do |t|
     t.date     "start"
@@ -18,6 +18,13 @@ ActiveRecord::Schema.define(version: 20171006122209) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
     t.index ["semester_break_plan_id"], name: "index_day_slots_on_semester_break_plan_id"
+  end
+
+  create_table "holidays", force: :cascade do |t|
+    t.date     "day"
+    t.string   "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "semester_break_plan_connections", force: :cascade do |t|
@@ -32,8 +39,8 @@ ActiveRecord::Schema.define(version: 20171006122209) do
   end
 
   create_table "semester_break_plans", force: :cascade do |t|
-    t.datetime "start"
-    t.datetime "end"
+    t.date     "start"
+    t.date     "end"
     t.string   "name"
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false

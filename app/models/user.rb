@@ -63,7 +63,6 @@ class User < ApplicationRecord
   def is_planable? plan
     plan.time_slots.each do |slot|
       slot.semester_plan_connections.each do |con|
-        p "user: #{con.user.get_name}"
         if con.user == self
           return true
         end

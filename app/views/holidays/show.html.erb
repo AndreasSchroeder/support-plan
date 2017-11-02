@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Datum:</strong>
+  <%= german_day @holiday.day %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @holiday.name %>
+</p>
+
+<%= link_to 'Bearbeiten', edit_holiday_path(@holiday), class: "btn btn-sm btn-success" %> |
+<%= link_to 'Zurück', holidays_path, class: "btn btn-sm btn-warning" %>
