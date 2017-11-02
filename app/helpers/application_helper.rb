@@ -81,6 +81,31 @@ module ApplicationHelper
     end
   end
 
+  def german_dayname time
+    if time
+      dayname= ""
+      case time.wday
+      when 0
+        dayname = "So"
+      when 1
+        dayname = "Mo"
+      when 2
+        dayname = "Di"
+      when 3
+        dayname = "Mi"
+      when 4
+        dayname = "Do"
+      when 5
+        dayname = "Fr"
+      when 6
+        dayname = "Sa"
+      end                                        
+      return "#{dayname} #{time.strftime('%d.%m.%Y')}"
+    else
+      return "Keine Zeit vorhanden"
+    end
+  end
+
   def parse_day time
     if time
       return time.strftime("%Y-%m-%d")
