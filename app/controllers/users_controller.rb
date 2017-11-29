@@ -18,8 +18,13 @@ class UsersController < ApplicationController
     @users = User.all
     @user = User.find_by(email: checks_email_alternativ(params[:user][:email].downcase))
     if @user
-      @user.update(planable: true)
-      flash[:success] = "Benutzer wurde reaktiviert."
+      if @user.inactive
+        @user.update(inactive: false)
+        flash[:success] = "Benutzer wurde reaktiviert."
+      else
+        flash[:success] = "Benutzer bereits vorhanden"
+        
+      end
     elsif @user = User.new(email: params[:user][:email])
       if is_ldap? @user.email
         if @user.save
@@ -27,7 +32,7 @@ class UsersController < ApplicationController
           flash[:success] = "Benutzer wurde aktiviert."
         end
       else
-      flash[:danger] = "User nicht im LDAP-System."
+        flash[:danger] = "User nicht im LDAP-System."
       end
     else
       flash[:danger] = "Anlegen ist fehlgeschlagen."
