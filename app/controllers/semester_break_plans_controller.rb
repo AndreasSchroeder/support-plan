@@ -1,4 +1,5 @@
 class SemesterBreakPlansController < ApplicationController
+  before_action :admin_user, only: [:new, :create, :destroy]
   before_action :set_semester_break_plan, only: [:show, :edit, :update, :destroy]
 
   # GET /semester_break_plans
@@ -70,5 +71,13 @@ class SemesterBreakPlansController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def semester_break_plan_params
       params.require(:semester_break_plan).permit(:start, :end, :name, :free, :solution, day_slots_attributes: [:semester_break_plan_id, :id, semester_break_plan_connections_attributes:[:id, :availability, :user_id, :day_slot_id]])
+    end
+
+    # Confirms an admin user.
+    def admin_user
+      unless current_user.is_admin?
+        flash[:danger] = "Keine Berechtigung."
+        redirect_to(root_url)
+      end
     end
 end

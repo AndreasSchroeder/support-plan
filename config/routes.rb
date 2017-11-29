@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'semester_break_plans/:id/solve', to: 'semester_break_plan_solvers#solve', as: 'solve'
+
   delete '/day_slots/:id/destroy', to: 'day_slots#destroy'
 
   get 'semester_break_plans/index'
