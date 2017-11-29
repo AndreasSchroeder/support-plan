@@ -50,6 +50,7 @@ class ApplicationController < ActionController::Base
                 :encryption => :start_tls,
                 :base => "uid="+name+",ou=people,dc=uni-osnabrueck,dc=de" # the base of your AD tree goes here,
                 # true if possible
+               #p ldap.search("dc=uni-osnabrueck,dc=de")
                 return ldap.bind
         end
         return false
