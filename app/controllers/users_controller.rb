@@ -7,9 +7,6 @@ class UsersController < ApplicationController
   def index
     @user = User.new
     @users = User.where(inactive: false)
-    @users.each do |user|
-      p "#{user.email}: #{ is_ldap?(user.email)}"
-    end
   end
 
   def show
