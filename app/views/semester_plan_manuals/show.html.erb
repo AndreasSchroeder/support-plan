@@ -16,7 +16,7 @@
           <th>
              Co-Supporter
           </th>
-          <% @users.each do |user| %>
+          <% @users_tec.each do |user| %>
             <th>
               <div title=<%= "#{user.get_name_or_alias}" %>>
                 <%= user.get_initial %>
@@ -31,7 +31,7 @@
           </th>
           <th colspan="3">
           </th>
-          <% @users.each do |user| %>
+          <% @users_tec.each do |user| %>
             <th>
               <div title=<%= "#{user.get_name_or_alias}" %>>
                 <%= user.hours %>
@@ -47,7 +47,7 @@
           <th  colspan="3">
             Supporter/Co-Supporter
           </th>
-          <% @users.each do |user| %>
+          <% @users_tec.each do |user| %>
             <th>
               <div title=<%= "#{user.get_name_or_alias}" %>>
                 <%= @plan.get_amount_of_shifts_in_solution user %>
@@ -61,7 +61,7 @@
           </th>
 
           <% all_hours = @users_tec.inject(0){|sum, x| sum +x.hours.to_i} %>
-          <% @users.each do |user| %>
+          <% @users_tec.each do |user| %>
             <th>
               <% if !user.office %>
                 <div title=<%= "#{user.get_name_or_alias}" %>>
@@ -110,7 +110,7 @@
               </td>
             <% end %>
 
-            <% @users.each do |user| %>
+            <% @users_tec.each do |user| %>
               <td title=<%="#{user.get_name_or_alias}"%> class=<%=get_av_user_slot user, TimeSlot.find(slot[:slot].to_i)%> >
 
               </td>
