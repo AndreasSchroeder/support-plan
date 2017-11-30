@@ -41,16 +41,22 @@ class ApplicationController < ActionController::Base
     # Checks if a user is in LDAP Database
     def is_ldap? (email)
         #Domain of User is Uni Osna?
-        domain = email.downcase.split("@").last
+        domain = email.downcase.split("@").last.strip
         if domain == "uni-osnabrueck.de" || domain == "uos.de"
             # autehntificate if possible
-            name = email.downcase.split("@").first
+            name = email.downcase.split("@").first.strip
             ldap = Net::LDAP.new :host => "ldap.uni-osnabrueck.de",
                 :port => "389",
                 :encryption => :start_tls,
-                :base => "uid="+name+",ou=people,dc=uni-osnabrueck,dc=de" # the base of your AD tree goes here,
+                :base => "ou=people,dc=uni-osnabrueck,dc=de" # the base of your AD tree goes here,
                 # true if possible
-                return ldap.bind
+            filter = Net::LDAP::Filter.eq("uid", "#{name}")
+            p name
+            ldap.search(base: "dc=uni-osnabrueck,dc=de", filter: filter) do |entry|
+                if entry
+                    return true
+                end
+            end
         end
         return false
     end
