@@ -146,6 +146,7 @@ module SemesterPlansHelper
     sort_soluitons(plan, [child, rotate_clone, opt_clone]).first
   end
 
+  # BUG: MANCHMAL TAUSCHT DIESE METHODE NICHT!!! SONDERN ÜBERSCHREIBT NUR IN EINE RICHTUNG
   def mutate_pairs plan, child
     origin = child.clone
     elem0 = nil
@@ -153,7 +154,7 @@ module SemesterPlansHelper
     19.times do |n|
       elem0 = child[n]
       elem1 = child[n + 1]
-      if elem0[:user] != elem1[:user]
+      if elem0[:user] != elem1[:user] && true #BUG HIER MUSS NOCH HIN; DASS DER TAG GLEICH IST
          users0 = TimeSlot.find(elem0[:slot]).get_users 1
          users1 = TimeSlot.find(elem1[:slot]).get_users 1
          if users1.detect{|x| x.to_i == elem0[:user].to_i}
@@ -162,14 +163,18 @@ module SemesterPlansHelper
             slot = slots.shuffle.first
 
             child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user] = elem1[:user].to_i
+            cloney = child[n + 1][:user]
             child[n + 1][:user] = elem0[:user].to_i
+            #child[n][:user] = cloney
           end
         elsif users0.detect{|x| x.to_i == elem1[:user].to_i}
           slots = plan.get_slots_of_user_av1 child, elem1[:user], elem0[:user], elem1[:slot], elem0[:slot]
           if slots.any?
             slot = slots.shuffle.first
             child.detect{|x| x[:slot].to_i == slot.id.to_i}[:user] = elem0[:user].to_i
+            cloney = child[n][:user]
             child[n][:user] = elem1[:user].to_i
+            #child[n + 1][:user] = cloney
           end
         end
       end

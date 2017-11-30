@@ -3,6 +3,26 @@ class SemesterPlan < ApplicationRecord
   has_many :time_slots
 
 
+  def has_entrys(user)
+    yes = true
+    found = false
+    self.time_slots.each do |slot|
+      slot.semester_plan_connections.each do | con|
+        if con.user == user
+          found = true
+          if con.availability == 0 || con.availability == nil
+
+            yes = false
+
+          end
+        end
+      end
+    end
+    if !found
+      return false
+    end
+    return yes
+  end
 
   def get_fitness_of_solution (solution)
 
