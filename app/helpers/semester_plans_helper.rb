@@ -16,33 +16,50 @@ module SemesterPlansHelper
   # switch action to serveral methods
   def optimize(params)
     plan = SemesterPlan.find(params[:id])
-    case params["optimisation"]["kind"]
-      when "0"
-        if plan.solution.nil?
-          empty_slots = []
-          plan.time_slots.each_with_index do |n, index|
-            empty_slots << {index: index, user: nil, co: nil, slot: n.id}
-          end
-          plan.update(solution: empty_slots)
+    users = User.users_of_plan_pure plan
+    empty_hours = false
+    if users.any?
+      users.each do |user|
+        if user.hours == 0 || user.hours == nil
+          empty_hours = true
         end
-        flash[:success] = " Manuelle Planerstellung eingeleitet"
-          redirect_to valid_path User.find(params[:id]), show_new: true
-      when "1"
-        flash[:success] = " Gültiger Plan wurde erstellt."
-        sol = valid_solution2(false)
-        plan.update(solution: "#{mutate_pairs(plan, sol)}")
 
-        if feasible plan.solution
-          plan.update(solution: "#{valid_solution2(true)}")
-        end
-        redirect_to valid_path User.find(params[:id]), show_new: true
-      when "2"
-        plan.update(solution: "#{heuristic (plan)}")
-        if feasible plan.solution
-          plan.update(solution: "#{valid_solution2 true}")
-        end
-        flash[:success] = " 2 verlinkt!"
-        redirect_to valid_path User.find(params[:id]), show_new: true
+      end
+
+    end
+    if !empty_hours
+      case params["optimisation"]["kind"]
+        when "0"
+          if plan.solution.nil?
+            empty_slots = []
+            plan.time_slots.each_with_index do |n, index|
+              empty_slots << {index: index, user: nil, co: nil, slot: n.id}
+            end
+            plan.update(solution: empty_slots)
+          end
+          flash[:success] = " Manuelle Planerstellung eingeleitet"
+            redirect_to valid_path User.find(params[:id]), show_new: true
+        when "1"
+          flash[:success] = " Gültiger Plan wurde erstellt."
+          sol = valid_solution2(false)
+          plan.update(solution: "#{mutate_pairs(plan, sol)}")
+
+          if feasible plan.solution
+            plan.update(solution: "#{valid_solution2(true)}")
+          end
+          redirect_to valid_path User.find(params[:id]), show_new: true
+        when "2"
+          plan.update(solution: "#{heuristic (plan)}")
+          if feasible plan.solution
+            plan.update(solution: "#{valid_solution2 true}")
+          end
+          flash[:success] = " 2 verlinkt!"
+          redirect_to valid_path User.find(params[:id]), show_new: true
+      end
+    else
+      flash[:danger] = "Abbruch: Ein Nutzer hat keine Stunden eingetragen!"
+      redirect_to semester_plan_path plan
+
     end
   end
 
