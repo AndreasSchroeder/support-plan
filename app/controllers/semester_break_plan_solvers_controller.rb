@@ -1,9 +1,17 @@
 class SemesterBreakPlanSolversController < ApplicationController
   before_action :admin_user, only: [:solve]
 
+  def show
+    @plan = SemesterBreakPlan.find(params[:id])
+    p "IN SHOW #{@plan.solution}"
+
+  end
+
   def solve
   	@plan = SemesterBreakPlan.find(params[:id])
   	@plan.solve(0)
+    p "IN SOLVES #{@plan.solution}"
+    redirect_to action: 'show'
   end
 
   private

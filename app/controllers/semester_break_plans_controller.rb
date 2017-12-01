@@ -9,6 +9,7 @@ class SemesterBreakPlansController < ApplicationController
 
   # GET /semester_break_plans/1
   def show
+    @semester_break_plan.update_users
   end
 
   # GET /semester_break_plans/new

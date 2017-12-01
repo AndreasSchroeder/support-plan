@@ -32,7 +32,6 @@
 
       </tr>
       <%= form.fields_for(:day_slots) do |form2| %>
-      <% p form2.object %>
         <tr>
           <% if is_admin? %>
             <td><%= link_to 'Feiertag/Brückentag',  {:controller => "day_slots", :action => 'destroy', :id => form2.object.id, plan_id: @semester_break_plan.id}, :confirm => "Sind Sie sicher?", :method => :delete, tabindex: -1, class: "btn btn-sm btn-warning"  %></td>
@@ -55,4 +54,4 @@
   </div>
   <%= form.submit "Plan speichern", class: "brn btn-lg btn-success" %>
 <% end %>
-<%= link_to "Lösen", solve_path %>
+<%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan), :method => :post %>
