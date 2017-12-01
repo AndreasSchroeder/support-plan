@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 20171006122209) do
   create_table "semester_break_plan_connections", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "day_slot_id"
-    t.integer  "availability"
+    t.integer  "availability", default: 0
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
     t.integer  "typus"

@@ -47,7 +47,7 @@ class SemesterPlansController < ApplicationController
   def show
     @plan = SemesterPlan.find(params[:id])
     @users = []
-    @users = User.users_of_plan @plan
+    @users = User.users_of_plan_pure @plan
     @slots = []
     @options = {0 => "manuellen Plan erstellen", 1 => "gültige Lösungen berechnen lassen", 2 => "hinreichend optimale Lösung berechnen lassen"}
     @users.each do |user|

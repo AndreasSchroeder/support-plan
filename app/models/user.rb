@@ -63,7 +63,6 @@ class User < ApplicationRecord
   def is_planable? plan
     plan.time_slots.each do |slot|
       slot.semester_plan_connections.each do |con|
-        p "user: #{con.user.get_name}"
         if con.user == self
           return true
         end
@@ -72,10 +71,26 @@ class User < ApplicationRecord
     return self.planable
   end
 
+  def self.users_of_plan_pure plan
+    users = []
+    User.all.each do |user|
+      if user.is_planable?(plan) 
+        users << user
+      end
+    end
+    User.all.each do |user|
+      if user.office
+        users << user
+      end
+    end
+    users.uniq
+  end
+
+
   def self.users_of_plan plan
     users = []
     User.all.each do |user|
-      if user.is_planable? plan
+      if user.is_planable?(plan) && plan.has_entrys(user)
         users << user
       end
     end
@@ -90,7 +105,7 @@ class User < ApplicationRecord
   def self.users_of_plan_without_office plan
     users = []
     User.all.each do |user|
-      if user.is_planable? plan
+      if user.is_planable?(plan) && plan.has_entrys(user)
         users << user
       end
     end

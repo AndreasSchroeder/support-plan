@@ -16,33 +16,50 @@ module SemesterPlansHelper
   # switch action to serveral methods
   def optimize(params)
     plan = SemesterPlan.find(params[:id])
-    case params["optimisation"]["kind"]
-      when "0"
-        if plan.solution.nil?
-          empty_slots = []
-          plan.time_slots.each_with_index do |n, index|
-            empty_slots << {index: index, user: nil, co: nil, slot: n.id}
-          end
-          plan.update(solution: empty_slots)
+    users = User.users_of_plan_pure plan
+    empty_hours = false
+    if users.any?
+      users.each do |user|
+        if user.hours == 0 || user.hours == nil
+          empty_hours = true
         end
-        flash[:success] = " Manuelle Planerstellung eingeleitet"
-          redirect_to valid_path User.find(params[:id]), show_new: true
-      when "1"
-        flash[:success] = " Gültiger Plan wurde erstellt."
-        sol = valid_solution2(false)
-        plan.update(solution: "#{mutate_pairs(plan, sol)}")
 
-        if feasible plan.solution
-          plan.update(solution: "#{valid_solution2(true)}")
-        end
-        redirect_to valid_path User.find(params[:id]), show_new: true
-      when "2"
-        plan.update(solution: "#{heuristic (plan)}")
-        if feasible plan.solution
-          plan.update(solution: "#{valid_solution2 true}")
-        end
-        flash[:success] = " 2 verlinkt!"
-        redirect_to valid_path User.find(params[:id]), show_new: true
+      end
+
+    end
+    if !empty_hours
+      case params["optimisation"]["kind"]
+        when "0"
+          if plan.solution.nil?
+            empty_slots = []
+            plan.time_slots.each_with_index do |n, index|
+              empty_slots << {index: index, user: nil, co: nil, slot: n.id}
+            end
+            plan.update(solution: empty_slots)
+          end
+          flash[:success] = " Manuelle Planerstellung eingeleitet"
+            redirect_to valid_path User.find(params[:id]), show_new: true
+        when "1"
+          flash[:success] = " Gültiger Plan wurde erstellt."
+          sol = valid_solution2(false)
+          plan.update(solution: "#{mutate_pairs(plan, sol)}")
+
+          if feasible plan.solution
+            plan.update(solution: "#{valid_solution2(true)}")
+          end
+          redirect_to valid_path User.find(params[:id]), show_new: true
+        when "2"
+          plan.update(solution: "#{heuristic (plan)}")
+          if feasible plan.solution
+            plan.update(solution: "#{valid_solution2 true}")
+          end
+          flash[:success] = " 2 verlinkt!"
+          redirect_to valid_path User.find(params[:id]), show_new: true
+      end
+    else
+      flash[:danger] = "Abbruch: Ein Nutzer hat keine Stunden eingetragen!"
+      redirect_to semester_plan_path plan
+
     end
   end
 
@@ -146,6 +163,7 @@ module SemesterPlansHelper
     sort_soluitons(plan, [child, rotate_clone, opt_clone]).first
   end
 
+  # BUG: MANCHMAL TAUSCHT DIESE METHODE NICHT!!! SONDERN ÜBERSCHREIBT NUR IN EINE RICHTUNG
   def mutate_pairs plan, child
     origin = child.clone
     elem0 = nil
@@ -153,7 +171,7 @@ module SemesterPlansHelper
     19.times do |n|
       elem0 = child[n]
       elem1 = child[n + 1]
-      if elem0[:user] != elem1[:user]
+      if elem0[:user] != elem1[:user] && true #BUG HIER MUSS NOCH HIN; DASS DER TAG GLEICH IST
          users0 = TimeSlot.find(elem0[:slot]).get_users 1
          users1 = TimeSlot.find(elem1[:slot]).get_users 1
          if users1.detect{|x| x.to_i == elem0[:user].to_i}
@@ -162,14 +180,18 @@ module SemesterPlansHelper
             slot = slots.shuffle.first
 
             child.detect{|x| x[:slot].to_i == slot[:id].to_i}[:user] = elem1[:user].to_i
+            cloney = child[n + 1][:user]
             child[n + 1][:user] = elem0[:user].to_i
+            #child[n][:user] = cloney
           end
         elsif users0.detect{|x| x.to_i == elem1[:user].to_i}
           slots = plan.get_slots_of_user_av1 child, elem1[:user], elem0[:user], elem1[:slot], elem0[:slot]
           if slots.any?
             slot = slots.shuffle.first
             child.detect{|x| x[:slot].to_i == slot.id.to_i}[:user] = elem0[:user].to_i
+            cloney = child[n][:user]
             child[n][:user] = elem1[:user].to_i
+            #child[n + 1][:user] = cloney
           end
         end
       end
