@@ -1,3 +1,4 @@
+require 'day_week'
 class SemesterBreakPlan < ApplicationRecord
   has_many :day_slots, -> { order(:start) }
   accepts_nested_attributes_for :day_slots
@@ -18,6 +19,15 @@ class SemesterBreakPlan < ApplicationRecord
   end
 
   def solve_valid
+    weeks = DayWeek.generate_weeks(self.day_slots.all)
+
+    weeks.each do |week|
+      users = User.users_of_break_plan(self)
+      best = week.best_for_users(users, 1)
+      sorted_users = self.sort_user_by_av(users, 1)
+      p "Best is: #{best}"
+    end
+
     return ["currently empty valid"]
   end
 
@@ -60,10 +70,7 @@ class SemesterBreakPlan < ApplicationRecord
   def update_days(users)
     days_between = DaySlot.days_between self.start, self.end
     days_plan = self.day_slots.map {|day| day.start}
-    p "day_b: #{days_between}"
-    p "day_p: #{days_plan}"
     days_new = days_between - days_plan
-    p "day_n: #{days_new}"
     if days_new.any?
       days_new.each do |day|
         slot = self.day_slots.create(start: day)
@@ -113,6 +120,12 @@ class SemesterBreakPlan < ApplicationRecord
     end
     to_delete.each do |del|
       del.to_delete
+    end
+  end
+
+  def sort_user_by_av users, av
+    self.day_slots.each do |slot|
+
     end
   end
 

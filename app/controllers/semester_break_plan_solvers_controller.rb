@@ -3,14 +3,12 @@ class SemesterBreakPlanSolversController < ApplicationController
 
   def show
     @plan = SemesterBreakPlan.find(params[:id])
-    p "IN SHOW #{@plan.solution}"
 
   end
 
   def solve
   	@plan = SemesterBreakPlan.find(params[:id])
   	@plan.solve(params[:type].to_i)
-    p "IN SOLVES #{@plan.solution}"
     redirect_to action: 'show'
   end
 
