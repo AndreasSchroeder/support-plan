@@ -45,7 +45,7 @@
               <% else %>
                 <%= form3.object.availability  %>
               <% end %>
-                
+
               </td>
           <% end %>
         </tr>
@@ -54,4 +54,4 @@
   </div>
   <%= form.submit "Plan speichern", class: "brn btn-lg btn-success" %>
 <% end %>
-<%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan), :method => :post %>
+<%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan, type: 1), :method => :post %>

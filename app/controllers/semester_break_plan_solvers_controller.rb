@@ -9,7 +9,7 @@ class SemesterBreakPlanSolversController < ApplicationController
 
   def solve
   	@plan = SemesterBreakPlan.find(params[:id])
-  	@plan.solve(0)
+  	@plan.solve(params[:type].to_i)
     p "IN SOLVES #{@plan.solution}"
     redirect_to action: 'show'
   end

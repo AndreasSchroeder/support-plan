@@ -9,6 +9,7 @@ class SemesterBreakPlansController < ApplicationController
 
   # GET /semester_break_plans/1
   def show
+    @semester_break_plan.update_days @users
     @semester_break_plan.update_users
   end
 
@@ -31,10 +32,10 @@ class SemesterBreakPlansController < ApplicationController
         slot = @semester_break_plan.day_slots.create(start: parse_day(day))
         @users.each do |user|
           slot.semester_break_plan_connections.create(user: user)
-        end    
+        end
       end
       flash[:success] = "Ferien-Support-Plan angelegt."
-      redirect_to @semester_break_plan 
+      redirect_to @semester_break_plan
     else
       render :new
     end
@@ -44,9 +45,9 @@ class SemesterBreakPlansController < ApplicationController
   def update
     if @semester_break_plan.update(semester_break_plan_params)
       flash[:success] = "Ferien-Support-Plan aktualisiert."
-      redirect_to @semester_break_plan 
+      redirect_to @semester_break_plan
     else
-      render :edit 
+      render :edit
     end
   end
 

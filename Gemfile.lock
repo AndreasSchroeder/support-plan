@@ -86,7 +86,6 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.10.2)
     multi_json (1.12.1)
-    mysql2 (0.4.6)
     net-ldap (0.16.0)
     nio4r (2.0.0)
     nokogiri (1.7.2)
@@ -177,7 +176,6 @@ DEPENDENCIES
   jbuilder (~> 2.5)
   jquery-rails
   listen (~> 3.0.5)
-  mysql2 (>= 0.3.18, < 0.5)
   net-ldap
   openssl
   passenger
@@ -193,4 +191,4 @@ DEPENDENCIES
   will_paginate (= 3.1.0)
 
 BUNDLED WITH
-   1.15.0
+   1.16.0
