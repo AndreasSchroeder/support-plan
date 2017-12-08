@@ -21,22 +21,98 @@ class SemesterBreakPlan < ApplicationRecord
   # solves plan with a valid solution
   def solve_valid
     # generates array of weeks for all days
-    weeks = DayWeek.generate_weeks(self.day_slots.all)
-
+    init_av = 1
+    best = nil
+    best_sol = []
     # get users
     users = User.users_of_break_plan(self)
+    i = 0
+    while i < 10
+      sol = []
+      #initialize iteration
+      filled = false
+      error = false
+      type = i % 3
+      priority = self.sort_user_by_av(users, 1)
+      availabiltys_users = sort_user_by_av users, 1
+      shifts_user = User.supporter_amount_of_shifts self.day_slots.size, users
+      i_week = DayWeek.new(self.day_slots.all)
+      i_users = users.map{|u| u.id}
+      #gives for each week the user with the most following availability in a week
+      #solve
+      j = 0
+      while !filled && !error
+        best = i_week.best_for_users(users, 1)
+        user = nil
+        availabiltys_users_dup = availabiltys_users.dup
+        case type
+        when 1
+          selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
+          while shifts_user.detect{|sh| sh[:user] == selected[:user]}[:shifts] == 0
+            availabiltys_users_dup.delete selected
+            selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
 
-    #gives for each week the user with the most following availability in a week
-    weeks.each do |week|
-      best = week.best_for_users(users, 1)
-      sorted_users = self.sort_user_by_av(users, 1)
-      p "Best is: #{best}"
+          end
+          user = selected[:user]
+
+        when 0
+          selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i * -1}.first(3).shuffle.first
+          while shifts_user.detect{|sh| sh[:user] == selected[:user]}[:shifts] == 0
+            availabiltys_users_dup.delete selected
+            selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
+
+          end
+          user = selected[:user]
+        when 2
+          user = availabiltys_users.shuffle.first[:user]
+        end
+        chains = best.detect{|u| u[:user] == user}[:days]
+        best_chain = chains.first
+        if best_chain.any?
+          shifts = shifts_user.detect{|u| u[:user] == user}[:shifts]
+          if shifts < best_chain.size
+            best_chain = best_chain.first(shifts)
+          end
+          best_chain.to_a.each do |s|
+            sol << {slot: s, user: User.find(user).get_name, type: type, av: SemesterBreakPlanConnection.find_plan_by_ids(user, s).availability}
+            j = 0
+          end
+          i_week.remove_days best_chain
+          av = priority.detect{|u| u[:user] == user}[:av]
+          priority.detect{|u| u[:user] == user}[:av] -= [av, best_chain.size].min
+          shifts_user.detect{|u| u[:user] == user}[:shifts] -= best_chain.size
+          priority.delete_if{|d| d[:av] == 0}
+
+
+          #if SemesterPlanConnection.find_plan_by_ids(u[:user], d).availability <= init_av &&
+        end
+        if j > users.size * 2
+          if i_users.any?
+            inc = i_users.shuffle.first
+            shifts_user.detect{|su| su[:user] == inc}[:shifts] += 1
+            i_users -= [inc]
+            j = 0
+          end
+        end
+        if j > users.size * 4
+          error = true
+          sol = []
+        end
+        j += 1
+
+        # fill w
+        filled = i_week.days == []
+        if filled && get_fitness(sol.sort_by{|s| s[:slot]}) > get_fitness(best_sol.sort_by{|s| s[:slot]})
+          best_sol = sol.sort_by{|s| s[:slot]}
+        end
+      end
+
+          p "i: #{i}, sol: #{get_fitness(sol)} best: #{get_fitness(best_sol)}"
+    i  += 1
+
     end
-    availabiltys_users = sort_user_by_av users, 1
-    p "av: #{ availabiltys_users }"
-    shifts_user = User.supporter_amount_of_shifts self.day_slots.size, users
-    p "shifts: #{shifts_user}"
-    return ["currently empty valid"]
+
+    return best_sol.sort_by{|s| s[:slot]}
   end
 
   # solves the plan with good solution
@@ -104,6 +180,30 @@ class SemesterBreakPlan < ApplicationRecord
       end
     end
   end
+
+  def get_fitness sol
+    if sol == []
+      return -1000
+    end
+    sum = 0
+    last_user = nil
+    sol.each do |part|
+      if part[:av] == 1
+        sum += 3
+      elsif part[:av] == 2
+        sum += 0
+      else
+        sum -= 10
+      end
+      if last_user == part[:user]
+        sum += 2
+      end
+      last_user = part[:user]
+    end
+    sum
+
+  end
+
 
   private
 

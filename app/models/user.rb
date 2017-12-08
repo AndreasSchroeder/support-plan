@@ -200,7 +200,6 @@ class User < ApplicationRecord
     shifts.sort_by! { |item|
         [item[:shifts] * -1 , rnd.rand]
       }
-    p "users.size: #{users.size}, amount: #{amount}"
     if users.size <= amount
       while lazy = shifts.detect{|shift| shift[:shifts] == 0}
         shifts[0][:shifts] -= 1
