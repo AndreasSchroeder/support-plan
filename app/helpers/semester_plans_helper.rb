@@ -223,7 +223,7 @@ module SemesterPlansHelper
 
   def random_solution plan
     user = []
-    User.supporter_amount_of_shifts.each do  |s|
+    User.supporter_amount_of_shifts(20).each do  |s|
       s[:shifts].to_i.times do
         user << s[:user].to_i
       end
@@ -238,7 +238,7 @@ module SemesterPlansHelper
   end
 
   def structured_solution plan
-    shifts = User.supporter_amount_of_shifts.shuffle
+    shifts = User.supporter_amount_of_shifts(20).shuffle
     empty_slots = []
     user = shifts.shift
     plan.time_slots.each_with_index do |slot, index|
@@ -312,7 +312,7 @@ module SemesterPlansHelper
       # clone prioritys and shift-plans
       slot_priority = slot_priority_origin.clone
       user_priority = user_priority_origin.clone
-      shifts = User.supporter_amount_of_shifts
+      shifts = User.supporter_amount_of_shifts(20)
 
       # set break variable to false
       done = false

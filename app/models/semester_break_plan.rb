@@ -3,7 +3,7 @@ class SemesterBreakPlan < ApplicationRecord
   has_many :day_slots, -> { order(:start) }
   accepts_nested_attributes_for :day_slots
 
-
+  # redirect solving to correct method
   def solve type
     solution = []
     case type
@@ -18,23 +18,31 @@ class SemesterBreakPlan < ApplicationRecord
 
   end
 
+  # solves plan with a valid solution
   def solve_valid
+    # generates array of weeks for all days
     weeks = DayWeek.generate_weeks(self.day_slots.all)
 
+    # get users
+    users = User.users_of_break_plan(self)
+
+    #gives for each week the user with the most following availability in a week
     weeks.each do |week|
-      users = User.users_of_break_plan(self)
       best = week.best_for_users(users, 1)
       sorted_users = self.sort_user_by_av(users, 1)
       p "Best is: #{best}"
     end
+    p sort_user_by_av users, 1
 
     return ["currently empty valid"]
   end
 
+  # solves the plan with good solution
   def solve_good
     return ["currently empty good"]
   end
 
+  # a list of all users wich have connections in the plan
   def get_users
     update_users
     users = []
@@ -48,6 +56,7 @@ class SemesterBreakPlan < ApplicationRecord
 
   end
 
+  # updates users
   def update_users
     users = User.all
     users.each do |user|
@@ -62,8 +71,21 @@ class SemesterBreakPlan < ApplicationRecord
           clean_plan user
         end
       end
-  	end
+    end
 
+  end
+
+  def sort_user_by_av users, av
+    avs = []
+    users.each do |user|
+      av_sum = 0
+      self.day_slots.each do |slot|
+        fav = slot.semester_break_plan_connections.detect{|con| con.user == user}.availability.to_i
+        av_sum +=1 if (fav != 0 && fav <= av)
+      end
+      avs << {user: user.id, av: av_sum}
+    end
+    avs.sort_by{|user| user[:av] * (-1)}
   end
 
   # test if all days are given (holidays can be removed)
@@ -122,12 +144,5 @@ class SemesterBreakPlan < ApplicationRecord
       del.to_delete
     end
   end
-
-  def sort_user_by_av users, av
-    self.day_slots.each do |slot|
-
-    end
-  end
-
 
 end

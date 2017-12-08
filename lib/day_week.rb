@@ -36,11 +36,14 @@ class DayWeek
           row = []
         end
       end
-      if row != matches.last
+      if row != matches.last && row != []
         matches << row
       end
-      best << {user: user.id, days: matches.sort_by{|row| row.length * (-1)}.first}
+      if matches == []
+        matches = [[]]
+      end
+      best << {user: user.id, days: matches.sort_by{|row| row.length * (-1)}}
     end
-    best.sort_by{|user| user[:days].length() * (-1)}
+    best.sort_by{|user| user[:days].first.length() * (-1)}
   end
 end
