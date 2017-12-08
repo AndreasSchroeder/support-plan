@@ -146,13 +146,13 @@ class User < ApplicationRecord
   end
 
   # returns the sum of all hours of planable users
-  def self.hours_sum
-    User.where(planable: true).inject(0){|sum,x| sum + x.hours.to_i }
+  def self.hours_sum users
+    users.inject(0){|sum,x| sum + x.hours.to_i }
   end
 
   # returns the sum of the shifts (rounded)
-  def self.shifts_sum amount
-    User.where(planable: true).inject(0){|sum,x| sum + x.get_shifts_round(amount).to_i }
+  def self.shifts_sum amount, users
+    users.inject(0){|sum,x| sum + x.get_shifts_round(amount, users).to_i }
   end
 
   # return hours of user
@@ -161,25 +161,26 @@ class User < ApplicationRecord
   end
 
   # returns shift qut
-  def get_shift_quot amount
-    ((amount.to_f/User.hours_sum.to_f) * self.get_hours.to_f).to_f
+  def get_shift_quot amount, users
+    ((amount.to_f/User.hours_sum(users).to_f) * self.get_hours.to_f).to_f
   end
 
   # rounds shifts
-  def get_shifts_round amount
-    (self.get_shift_quot(amount) + 0.5).to_i
+  def get_shifts_round amount, users
+    (self.get_shift_quot(amount, users) + 0.5).to_i
   end
 
   # returns hash with amount of shifts per supporter
-  def self.supporter_amount_of_shifts amount
+  def self.supporter_amount_of_shifts amount, users
     rnd = Random.new
     # initialize and fill
     shifts = []
-    User.where(planable: true, inactive: false).each do |user|
-      shifts << {user: user.id, shifts: user.get_shifts_round(amount)}
+
+    users.each do |user|
+      shifts << {user: user.id, shifts: user.get_shifts_round(amount, users)}
     end
     # sum up
-    sum = User.shifts_sum(amount)
+    sum = User.shifts_sum(amount, users)
 
     # flatten hash, so sum is 20
     while sum > amount
@@ -195,6 +196,19 @@ class User < ApplicationRecord
       }
       shifts[0][:shifts] += 1
       sum +=1
+    end
+    shifts.sort_by! { |item|
+        [item[:shifts] * -1 , rnd.rand]
+      }
+    p "users.size: #{users.size}, amount: #{amount}"
+    if users.size <= amount
+      while lazy = shifts.detect{|shift| shift[:shifts] == 0}
+        shifts[0][:shifts] -= 1
+        lazy[:shifts] += 1
+        shifts.sort_by! { |item|
+          [item[:shifts] * -1 , rnd.rand]
+        }
+      end
 
     end
     #return hash

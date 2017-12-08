@@ -32,8 +32,10 @@ class SemesterBreakPlan < ApplicationRecord
       sorted_users = self.sort_user_by_av(users, 1)
       p "Best is: #{best}"
     end
-    p sort_user_by_av users, 1
-
+    availabiltys_users = sort_user_by_av users, 1
+    p "av: #{ availabiltys_users }"
+    shifts_user = User.supporter_amount_of_shifts self.day_slots.size, users
+    p "shifts: #{shifts_user}"
     return ["currently empty valid"]
   end
 
@@ -85,7 +87,7 @@ class SemesterBreakPlan < ApplicationRecord
       end
       avs << {user: user.id, av: av_sum}
     end
-    avs.sort_by{|user| user[:av] * (-1)}
+    avs.sort_by{|user| user[:av]}
   end
 
   # test if all days are given (holidays can be removed)

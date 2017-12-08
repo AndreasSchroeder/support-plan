@@ -5,7 +5,13 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-
+def parse_day time
+    if time
+      return time.strftime("%Y-%m-%d")
+    else
+      return "Keine Zeit vorhanden"
+    end
+  end
 ran = Random.new
 
 User.create(email: "admin@admintest.de", is_admin: true, first_name: "admin", planable: false)
@@ -111,6 +117,19 @@ end
     else
       @slots << SemesterPlanConnection.find_it(user, slot)
     end
+  end
+end
+
+@start = Time.new(2017,12,4)
+@ends = Time.new(2018,02,23)
+@break_plan = SemesterBreakPlan.create(name: "Test", start: @start, end: @ends)
+
+@users = User.users_of_break_plan @break_plan
+days = DaySlot.days_between @break_plan.start, @break_plan.end
+days.each do |day|
+  slot = @break_plan.day_slots.create(start: parse_day(day))
+  @users.each do |user|
+    slot.semester_break_plan_connections.create(user: user, availability: (ran.rand(0..2)%3)+1)
   end
 end
 
