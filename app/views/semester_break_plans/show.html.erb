@@ -38,17 +38,20 @@
           <% end %>
           <td> <%= german_dayname form2.object.start %></td>
 
+          <% i = 1 %>
           <%= form2.fields_for(:semester_break_plan_connections) do |form3| %>
-            <td>
+            <td >
               <% if is_admin? || form3.object.user == current_user %>
-                <%= form3.number_field :availability  %>
+                <%= form3.number_field :availability, tabindex: i   %>
               <% else %>
                 <%= form3.object.availability  %>
               <% end %>
 
               </td>
+            <% i += 1 %>
           <% end %>
         </tr>
+
       <% end %>
     </table>
   </div>
