@@ -36,7 +36,7 @@ class SemesterBreakPlan < ApplicationRecord
       priority = self.sort_user_by_av(users, 1)
       availabiltys_users = sort_user_by_av users, 1
       shifts_user = User.supporter_amount_of_shifts self.day_slots.size, users
-      i_week = DayWeek.new(self.day_slots.all)
+      i_week = DayWeek.new(self.day_slots.order(:start).all)
       i_users = users.map{|u| u.id}
       #gives for each week the user with the most following availability in a week
       #solve
@@ -74,7 +74,7 @@ class SemesterBreakPlan < ApplicationRecord
             best_chain = best_chain.first(shifts)
           end
           best_chain.to_a.each do |s|
-            sol << {slot: s, user: User.find(user).get_name, type: type, av: SemesterBreakPlanConnection.find_plan_by_ids(user, s).availability}
+            sol << {slot: s, user: User.find(user).id, type: type, av: SemesterBreakPlanConnection.find_plan_by_ids(user, s).availability}
             j = 0
           end
           i_week.remove_days best_chain
@@ -102,8 +102,12 @@ class SemesterBreakPlan < ApplicationRecord
 
         # fill w
         filled = i_week.days == []
-        if filled && get_fitness(sol.sort_by{|s| s[:slot]}) > get_fitness(best_sol.sort_by{|s| s[:slot]})
-          best_sol = sol.sort_by{|s| s[:slot]}
+        if filled
+          best_sol = best_sol.sort_by{|s| DaySlot.find(s[:slot]).start}
+          sol = sol.sort_by{|s| DaySlot.find(s[:slot]).start}
+          if get_fitness(sol) > get_fitness(best_sol)
+            best_sol = sol
+          end
         end
       end
 

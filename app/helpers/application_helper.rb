@@ -37,6 +37,19 @@ module ApplicationHelper
     return "av#{SemesterPlanConnection.find_it(user, slot).availability}"
   end
 
+  def get_av_break s, co
+    if co && s[:co]
+      return "av#{SemesterBreakPlanConnection.find_plan_by_ids(s[:co].to_i, (s[:slot].to_i())).availability}"
+    elsif !co && s[:user]
+      return "av#{SemesterBreakPlanConnection.find_plan_by_ids(s[:user].to_i, (s[:slot].to_i())).availability}"
+    end
+    return ""
+  end
+
+  def get_av_user_slot_break user, slot
+    return "av#{SemesterBreakPlanConnection.find_plan_by_ids(user, slot).availability}"
+  end
+
   def meeting_collection scores, plan
     @collection = []
     selected = false
@@ -99,7 +112,7 @@ module ApplicationHelper
         dayname = "Fr"
       when 6
         dayname = "Sa"
-      end                                        
+      end
       return "#{dayname} #{time.strftime('%d.%m.%Y')}"
     else
       return "Keine Zeit vorhanden"

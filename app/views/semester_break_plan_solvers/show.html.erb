@@ -1,5 +1,23 @@
 <h1>SemesterBreakPlanSolvers#soltve</h1>
 <p>Find me in app/views/semester_break_plan_solvers/solve.html.erb</p>
 
-<%= @plan.get_fitness eval @plan.solution %>
-<%= @plan.solution %>
+<div class=row >
+  <div class=col-lg-12>
+    <table class="table-hover table-bordered table">
+      <tr>
+        <th>Tag</th>
+        <th>Supporter</th>
+      </tr>
+      <% eval(@plan.solution).each do |slot| %>
+        <tr>
+          <td>
+            <%= german_dayname DaySlot.find(slot[:slot]).start %>
+          </td>
+          <td class=<%= get_av_user_slot_break slot[:user], slot[:slot] %>>
+            <%= User.find(slot[:user]).get_name %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
