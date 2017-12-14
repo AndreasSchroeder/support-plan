@@ -27,54 +27,93 @@ class SemesterBreakPlan < ApplicationRecord
     # get users
     users = User.users_of_break_plan(self)
     i = 0
-    while i < 10
-      sol = []
+    while i < 30
       #initialize iteration
+
+      sol = []
+      # variables for controlling flow
       filled = false
       error = false
-      type = i % 3
+
+      # type set to 3 -> best results
+      type = 3
+      rando = false
+      if type == 3
+        rando = true
+      end
+
+      #sort the users by amount of shifts with availability 1
       priority = self.sort_user_by_av(users, 1)
-      availabiltys_users = sort_user_by_av users, 1
+
+      # calculates shifts for each user by amount of hours
       shifts_user = User.supporter_amount_of_shifts self.day_slots.size, users
+
+      # saves all days.
+      # is needed for finding chains of availabilty
       i_week = DayWeek.new(self.day_slots.order(:start).all)
+
+      # helps to resize shifts per user each once
       i_users = users.map{|u| u.id}
-      #gives for each week the user with the most following availability in a week
-      #solve
+      # variable for controlling availability or end
       j = 0
       while !filled && !error
-        best = i_week.best_for_users(users, 1)
+        # sorted list of chains by number of following days with same user and availability
+        best = i_week.best_for_users(users, init_av)
         user = nil
-        availabiltys_users_dup = availabiltys_users.dup
-        case type
-        when 1
-          selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
-          while shifts_user.detect{|sh| sh[:user] == selected[:user]}[:shifts] == 0
-            availabiltys_users_dup.delete selected
-            selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
 
-          end
-          user = selected[:user]
+        # copy priority for avoiding sideeffects
+        priority_dup = priority.dup
 
-        when 0
-          selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i * -1}.first(3).shuffle.first
-          while shifts_user.detect{|sh| sh[:user] == selected[:user]}[:shifts] == 0
-            availabiltys_users_dup.delete selected
-            selected = availabiltys_users_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
-
-          end
-          user = selected[:user]
-        when 2
-          user = availabiltys_users.shuffle.first[:user]
+        # if type is 3, than shuffle with each step
+        if rando
+          type = [0,1,2].shuffle.first
         end
+
+        # switch on type
+        case type
+
+        # take long chains
+        when 0
+          selected = priority_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
+          while shifts_user.detect{|sh| sh[:user] == selected[:user]}[:shifts] == 0
+            priority_dup.delete selected
+            selected = priority_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
+
+          end
+          user = selected[:user]
+
+        # take short chains
+        when 1
+          selected = priority_dup.sort_by{|u| u[:av].to_i * -1}.first(3).shuffle.first
+          while shifts_user.detect{|sh| sh[:user] == selected[:user]}[:shifts] == 0
+            priority_dup.delete selected
+            selected = priority_dup.sort_by{|u| u[:av].to_i}.first(3).shuffle.first
+
+          end
+          user = selected[:user]
+
+        # take randomw
+        when 2
+          user = priority.shuffle.first[:user]
+        end
+
+        # find all chains of user
         chains = best.detect{|u| u[:user] == user}[:days]
+
+        # find best chain
         best_chain = chains.first
         if best_chain.any?
           shifts = shifts_user.detect{|u| u[:user] == user}[:shifts]
           if shifts < best_chain.size
-            best_chain = best_chain.first(shifts)
+            if shifts == 0
+              best_chain = best_chain.first(shifts)
+            else
+              start = rand(best_chain.size - shifts - 1)
+              best_chain = best_chain[start..shifts - 1]
+            end
           end
           best_chain.to_a.each do |s|
-            sol << {slot: s, user: User.find(user).id, type: type, av: SemesterBreakPlanConnection.find_plan_by_ids(user, s).availability}
+            sol << {slot: s, user: User.find(user).id, type: type, av: SemesterBreakPlanConnection.find_plan_by_ids(user, s).availability.to_f}
             j = 0
           end
           i_week.remove_days best_chain
@@ -95,6 +134,9 @@ class SemesterBreakPlan < ApplicationRecord
           end
         end
         if j > users.size * 4
+          init_av = 2
+        end
+        if j > users.size * 8
           error = true
           sol = []
         end
@@ -105,6 +147,7 @@ class SemesterBreakPlan < ApplicationRecord
         if filled
           best_sol = best_sol.sort_by{|s| DaySlot.find(s[:slot]).start}
           sol = sol.sort_by{|s| DaySlot.find(s[:slot]).start}
+          improve_sol sol
           if get_fitness(sol) > get_fitness(best_sol)
             best_sol = sol
           end
@@ -189,23 +232,66 @@ class SemesterBreakPlan < ApplicationRecord
     if sol == []
       return -1000
     end
-    sum = 0
+    sum = 0.0
+    add = 2.0
     last_user = nil
     sol.each do |part|
       if part[:av] == 1
-        sum += 3
+        sum += 3.0
       elsif part[:av] == 2
         sum += 0
       else
         sum -= 10
       end
       if last_user == part[:user]
-        sum += 2
+        sum += add
+        add *= 1.1
+      else
+        if add == 2.0
+          sum -= 4.0
+        end
+        add = 2.0
       end
       last_user = part[:user]
     end
-    sum
+    sum.to_i
 
+  end
+
+  def improve_sol sol
+    p find_short_chains 1, sol
+
+  end
+
+  def find_short_chains length, sol
+    output = []
+    count = 1
+    last = {user: nil}
+    shifts = []
+    shifts << sol.first[:slot]
+    sol.each do |part|
+      if last[:user] == part[:user]
+        shifts << part[:slot]
+      else
+        if shifts.size == length && last[:user]
+          output << {user: last[:user], slots: shifts}
+        end
+        shifts = []
+        shifts << part[:slot]
+      end
+      last = part
+    end
+    output
+  end
+
+  def get_amount_of_shifts_in_solution user
+    shifts = 0
+    eval(self.solution).each do |part|
+      if part[:user] == user.id
+        shifts += 1
+      end
+    end
+    shifts
   end
 
 
@@ -247,7 +333,7 @@ class SemesterBreakPlan < ApplicationRecord
       end
     end
     to_delete.each do |del|
-      del.to_delete
+      del.delete
     end
   end
 

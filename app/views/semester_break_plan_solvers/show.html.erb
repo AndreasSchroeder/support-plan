@@ -1,12 +1,63 @@
-<h1>SemesterBreakPlanSolvers#soltve</h1>
-<p>Find me in app/views/semester_break_plan_solvers/solve.html.erb</p>
+<h1>Einteilung</h1>
 
 <div class=row >
   <div class=col-lg-12>
     <table class="table-hover table-bordered table">
-      <tr>
         <th>Tag</th>
         <th>Supporter</th>
+        <th></th>
+        <% @plan.get_users.each do |user| %>
+          <th><div title=<%= user.get_name_or_alias %>><%= user.get_initial %> </div></th>
+        <% end %>
+      </tr>
+      <tr >
+          <th>
+            Stunden
+          </th>
+          <th colspan="2">
+          </th>
+          <% @plan.get_users.each do |user| %>
+            <th>
+              <div title=<%= "#{user.get_name_or_alias}" %>>
+                <%= user.hours %>
+                </div>
+            </th>
+          <% end %>
+        </tr>
+
+      <tr>
+      <tr>
+        <th rowspan=2>
+          Schichten
+        </th >
+        <th  colspan="2">
+          eingeteilte Schichten
+        </th>
+        <% @plan.get_users.each do |user| %>
+          <th>
+            <div title=<%= "#{user.get_name_or_alias}" %>>
+              <%= @plan.get_amount_of_shifts_in_solution user %>
+            </div>
+          </th>
+        <% end %>
+      </tr>
+      <tr>
+        <th colspan="2">
+          Schichten laut Vertrag
+        </th>
+
+        <% all_hours = @plan.get_users.inject(0){|sum, x| sum +x.hours.to_i} %>
+        <% @plan.get_users.each do |user| %>
+          <th>
+            <% if !user.office %>
+              <div title=<%= "#{user.get_name_or_alias}" %>>
+                <%= '%.2f' %(@plan.day_slots.size()*user.hours.to_f/all_hours) %>
+              </div>
+            <% end %>
+          </th>
+
+        <% end %>
+
       </tr>
       <% eval(@plan.solution).each do |slot| %>
         <tr>
@@ -16,6 +67,12 @@
           <td class=<%= get_av_user_slot_break slot[:user], slot[:slot] %>>
             <%= User.find(slot[:user]).get_name %>
           </td>
+          <td></td>
+          <% @plan.get_users.each do |user| %>
+            <td title=<%= user.get_name_or_alias %> class=<%= get_av_user_slot_break user.id, slot[:slot] %>>
+
+            </td>
+          <% end %>
         </tr>
       <% end %>
     </table>
