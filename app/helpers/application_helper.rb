@@ -1,5 +1,5 @@
 module ApplicationHelper
-    def get_collection s, co, plan
+  def get_collection s, co, plan
     @collection = []
     users = User.users_of_plan_without_office plan
     selected = false
@@ -12,6 +12,29 @@ module ApplicationHelper
         @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}", selected: "" }]
       elsif s[:slot]
         @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterPlanConnection.find_it_id(user.id, (s[:slot].to_i())).availability}" }]
+      else
+        @collection << [user.get_name_or_alias, user.id]
+      end
+    end
+    if !selected
+      @collection << ["(niemand)", nil, {selected: ""}]
+    else
+      @collection << ["(niemand)", nil]
+    end
+    @collection
+  end
+
+  def get_collection_break s, plan
+    @collection = []
+    users = plan.get_users
+    selected = false
+    users.each do |user|
+      p "user: #{user}"
+      if s[:user].to_i == user.id
+        selected = true
+        @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterBreakPlanConnection.find_plan_by_ids(user.id, (s[:slot].to_i())).availability}", selected: "" }]
+      elsif s[:slot]
+        @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterBreakPlanConnection.find_plan_by_ids(user.id, (s[:slot].to_i())).availability}" }]
       else
         @collection << [user.get_name_or_alias, user.id]
       end
@@ -47,7 +70,11 @@ module ApplicationHelper
   end
 
   def get_av_user_slot_break user, slot
-    return "av#{SemesterBreakPlanConnection.find_plan_by_ids(user, slot).availability}"
+    if slot && user
+      return "av#{SemesterBreakPlanConnection.find_plan_by_ids(user, slot).availability}"
+    else
+      return "av#{0}"
+    end
   end
 
   def meeting_collection scores, plan

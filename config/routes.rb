@@ -29,6 +29,7 @@ Rails.application.routes.draw do
     member do
       post '/solve', to: 'semester_break_plan_solvers#solve', as: 'solve'
       get '/solve', to: 'semester_break_plan_solvers#show', as: 'valid_break'
+      patch 'solve', to: 'semester_break_plan_solvers#update'
     end
   end
   resources :holidays

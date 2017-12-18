@@ -12,6 +12,11 @@ class SemesterBreakPlanSolversController < ApplicationController
     redirect_to action: 'show'
   end
 
+  def update
+    flash[:success] = "Gespeichert."
+    redirect_to action: 'show'
+  end
+
   private
    	# Confirms an admin user.
     def admin_user

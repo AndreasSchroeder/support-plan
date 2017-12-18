@@ -8,7 +8,7 @@ class SemesterBreakPlan < ApplicationRecord
     solution = []
     case type
     when 0
-
+      solution = empty_solution
     when 1
       solution = solve_valid
     when 2
@@ -16,6 +16,14 @@ class SemesterBreakPlan < ApplicationRecord
     end
     self.update(solution: "#{solution}")
 
+  end
+
+  def empty_solution
+    sol = []
+    self.day_slots.order(:start).each do |slot|
+      sol << {slot: slot.id, user: nil, av: 0}
+    end
+    sol
   end
 
   # solves plan with a valid solution
