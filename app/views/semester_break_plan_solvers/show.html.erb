@@ -1,5 +1,4 @@
 <h1>Einteilung</h1>
-<h1> <%= @plan.solution %> </h1>
 
 <div class=row >
   <div class=col-lg-12>
@@ -69,7 +68,7 @@
             </td>
             <% if is_admin? %>
               <td>
-                <%= f.select("#{slot[:slot]}", options_for_select(get_collection_break slot, @plan),  {:selected => 0}, { class: (get_av(slot, false))})%>
+                <%= f.select("#{slot[:slot]}", options_for_select(get_collection_break slot, @plan),  {:selected => 0}, { class: (get_av_user_slot_break slot[:user], slot[:slot])})%>
               </td>
             <% else %>
               <td class=<%= get_av_user_slot_break slot[:user], slot[:slot] %>>

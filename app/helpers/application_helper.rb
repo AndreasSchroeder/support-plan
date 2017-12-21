@@ -29,7 +29,6 @@ module ApplicationHelper
     users = plan.get_users
     selected = false
     users.each do |user|
-      p "user: #{user}"
       if s[:user].to_i == user.id
         selected = true
         @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterBreakPlanConnection.find_plan_by_ids(user.id, (s[:slot].to_i())).availability}", selected: "" }]
@@ -71,9 +70,14 @@ module ApplicationHelper
 
   def get_av_user_slot_break user, slot
     if slot && user
-      return "av#{SemesterBreakPlanConnection.find_plan_by_ids(user, slot).availability}"
+      con = SemesterBreakPlanConnection.find_plan_by_ids(user, slot)
+      if con
+        return "av#{con.availability}"
+      else
+        return "av0"
+      end
     else
-      return "av#{0}"
+      return "av0"
     end
   end
 

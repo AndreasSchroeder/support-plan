@@ -58,3 +58,4 @@
   <%= form.submit "Plan speichern", class: "brn btn-lg btn-success" %>
 <% end %>
 <%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan, type: 1), :method => :post %>
+<%= link_to "Manuell", solve_semester_break_plan_path(@semester_break_plan, type: 0), :method => :post %>

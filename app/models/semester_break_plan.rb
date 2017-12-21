@@ -19,11 +19,15 @@ class SemesterBreakPlan < ApplicationRecord
   end
 
   def empty_solution
-    sol = []
-    self.day_slots.order(:start).each do |slot|
-      sol << {slot: slot.id, user: nil, av: 0}
+    if self.solution
+      return eval(self.solution)
+    else
+      sol = []
+      self.day_slots.order(:start).each do |slot|
+        sol << {slot: slot.id, user: nil, av: 0}
+      end
+      return sol
     end
-    sol
   end
 
   # solves plan with a valid solution
@@ -247,7 +251,7 @@ class SemesterBreakPlan < ApplicationRecord
       if part[:av] == 1
         sum += 3.0
       elsif part[:av] == 2
-        sum += 0
+        sum -= 0
       else
         sum -= 10
       end
@@ -267,7 +271,7 @@ class SemesterBreakPlan < ApplicationRecord
   end
 
   def improve_sol sol
-    p find_short_chains 1, sol
+    #p find_short_chains 1, sol
 
   end
 
