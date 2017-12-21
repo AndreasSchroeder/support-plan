@@ -15,7 +15,7 @@
   <% if @plans.any? %>
     <div class="col-md-6 well">
      <h3>
-      Pläne
+      Semester-Pläne
     </h3>
       <% @plans.each do |plan| %>
         <div class="col-md-6 well">
@@ -40,6 +40,35 @@
           <% if plan.fixed_solution != nil %>
             <h4>
               <%= link_to "Einteilung" , valid_path(plan.id), class: "btn btn-sm btn-success" %>
+            </h4>
+
+          <% end %>
+          <% if is_admin? %>
+            <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-sm btn-danger" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  <% if @plans_break.any? %>
+    <div class="col-md-6 well">
+     <h3>
+      Semesterferien-Pläne
+    </h3>
+      <% @plans_break.each do |plan| %>
+        <div class="col-md-6 well">
+          <h4>
+            <%= link_to "#{plan.name}" , semester_break_plan_path(plan.id), class: "btn btn-sm btn-primary" %>
+          </h4>
+          <p>
+            Start: <%= german_day plan.start %>
+          </p>
+          <p>
+            Ende: <%= german_day plan.end %>
+          </p>
+          <% if plan.fixed_solution%>
+            <h4>
+              <%= link_to "Einteilung" , solve_semester_break_plan_path(plan.id), class: "btn btn-sm btn-success" %>
             </h4>
 
           <% end %>

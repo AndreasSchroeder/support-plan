@@ -1,15 +1,13 @@
 class SemesterBreakPlanSolversController < ApplicationController
   before_action :admin_user, only: [:solve, :update]
-  before_action :set_plan, only: [:solve, :show, :update]
+  before_action :set_plan, only: [:solve, :show, :update, :fix, :fixed]
 
   def show
-    @plan = SemesterBreakPlan.find(params[:id])
-
+    @sol = eval(@plan.solution)
   end
 
   def solve
-  	@plan = SemesterBreakPlan.find(params[:id])
-  	@plan.solve(params[:type].to_i)
+    @plan.solve(params[:type].to_i)
     redirect_to action: 'show'
   end
 
@@ -21,6 +19,17 @@ class SemesterBreakPlanSolversController < ApplicationController
     @plan.update(solution: "#{sol}")
     flash[:success] = "Gespeichert."
     redirect_to action: 'show'
+  end
+
+  def fix
+    @plan.update(fixed_solution: @plan.solution)
+    flash[:success] = "Gespeichert."
+    redirect_to action: 'show'
+  end
+
+  def fixed
+    @sol = eval(@plan.fixed_solution)
+    render :show
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171102074458) do
+ActiveRecord::Schema.define(version: 20171221112829) do
 
   create_table "day_slots", force: :cascade do |t|
     t.date     "start"
@@ -42,10 +42,12 @@ ActiveRecord::Schema.define(version: 20171102074458) do
     t.date     "start"
     t.date     "end"
     t.string   "name"
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-    t.boolean  "free",       default: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.boolean  "free",           default: false
     t.text     "solution"
+    t.boolean  "inactive",       default: false
+    t.text     "fixed_solution"
   end
 
   create_table "semester_plan_connections", force: :cascade do |t|

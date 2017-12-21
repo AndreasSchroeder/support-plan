@@ -28,8 +28,10 @@ Rails.application.routes.draw do
   resources :semester_break_plans,   only: [:new, :create, :destroy, :edit, :update, :show] do
     member do
       post '/solve', to: 'semester_break_plan_solvers#solve', as: 'solve'
+      get '/fixed', to: 'semester_break_plan_solvers#fixed'
+      post '/fixed', to: 'semester_break_plan_solvers#fix'
       get '/solve', to: 'semester_break_plan_solvers#show', as: 'valid_break'
-      patch 'solve', to: 'semester_break_plan_solvers#update'
+      patch '/solve', to: 'semester_break_plan_solvers#update'
     end
   end
   resources :holidays
