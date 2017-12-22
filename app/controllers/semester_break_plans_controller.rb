@@ -55,7 +55,7 @@ class SemesterBreakPlansController < ApplicationController
   def destroy
     @semester_break_plan.update(inactive: true)
     flash[:success] = "Ferien-Support-Plan gelöscht."
-    redirect_to semester_break_plans_url
+    redirect_to root_path
   end
 
   private

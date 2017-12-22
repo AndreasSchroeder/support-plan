@@ -12,7 +12,7 @@
   <% end %>
   <div class="field">
     <%= f.label :name %>
-    <%= f.text_field :name %>
+    <%= f.text_field :name, value: name_semester_break %>
   </div>
 
   <div class="field">
@@ -25,13 +25,10 @@
     <%= f.text_field :end, class: "datepicker" %>
   </div>
 
-  <div class="field">
-    <%= f.label :free %>
-    <%= f.check_box :free %>
-  </div>
+
 
 
   <div class="actions">
-    <%= f.submit "Semester-Ferien-Support-Plan anlegen" %>
+    <%= f.submit "Semester-Ferien-Support-Plan anlegen", class: "btn btn-lg btn-success" %>
   </div>
 <% end %>

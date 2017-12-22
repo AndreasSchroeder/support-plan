@@ -2,13 +2,16 @@ require 'day_week'
 class SemesterBreakPlan < ApplicationRecord
   has_many :day_slots, -> { order(:start) }
   accepts_nested_attributes_for :day_slots
+  validates_presence_of :name
+  validate :validate_dates
+
 
   # redirect solving to correct method
   def solve type
     solution = []
     case type
     when 0
-      solution = empty_solution
+      solution = empty_solution false
     when 1
       solution = solve_valid
     when 2
@@ -18,12 +21,20 @@ class SemesterBreakPlan < ApplicationRecord
 
   end
 
-  def empty_solution
-    if self.solution
-      return eval(self.solution)
+  def empty_solution fixed
+    if !fixed
+      if self.solution
+        return eval(self.solution)
+      else
+        sol = []
+        self.day_slots.order(:start).each do |slot|
+          sol << {slot: slot.id, user: nil, av: 0}
+        end
+        return sol
+      end
     else
       sol = []
-      self.day_slots.order(:start).each do |slot|
+        self.day_slots.order(:start).each do |slot|
         sol << {slot: slot.id, user: nil, av: 0}
       end
       return sol
@@ -296,9 +307,9 @@ class SemesterBreakPlan < ApplicationRecord
     output
   end
 
-  def get_amount_of_shifts_in_solution user
+  def get_amount_of_shifts_in_solution user, sol
     shifts = 0
-    eval(self.solution).each do |part|
+    sol.each do |part|
       if part[:user] == user.id
         shifts += 1
       end
@@ -346,6 +357,21 @@ class SemesterBreakPlan < ApplicationRecord
     end
     to_delete.each do |del|
       del.delete
+    end
+  end
+
+  # VALIDATIONS
+  def validate_dates
+    if !self.start
+      errors.add(:start, "Start Datum muss gesetzt werden!")
+    end
+    if !self.end
+      errors.add(:end, "End Datum muss gesetzt werden!")
+    end
+    if self.start && self.end
+      if self.start > self.end
+        errors.add(:start, "Das Start Datum muss vor dem End Datum liegen!")
+      end
     end
   end
 
