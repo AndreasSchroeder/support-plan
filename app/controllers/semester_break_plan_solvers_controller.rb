@@ -29,7 +29,7 @@ class SemesterBreakPlanSolversController < ApplicationController
 
   def fixed
     @sol = eval(@plan.fixed_solution)
-    render :show
+    render template: "semester_break_plans/show"
   end
 
   private

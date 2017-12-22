@@ -48,7 +48,7 @@
             Schichten laut Vertrag
           </th>
 
-          <% all_hours = @plan.get_users.inject(0){|sum, x| sum +x.hours.to_i} %>
+          <% all_hours = @plan.get_users.inject(0){|sum, x| sum + x.hours.to_i} %>
           <% @plan.get_users.each do |user| %>
             <th>
               <% if !user.office %>
@@ -61,7 +61,7 @@
           <% end %>
 
         </tr>
-        <% eval(@plan.solution).each do |slot| %>
+        <% eval(@sol).each do |slot| %>
           <tr>
             <td>
               <%= german_dayname DaySlot.find(slot[:slot]).start %>
@@ -90,5 +90,8 @@
         <%= f.submit :Übernehmen, class:"btn btn-lg btn-success"%>
       </div>
     <% end %>
+  </div>
+  <div>
+    <%= link_to fixed_semester_break_plan_path @plan %>
   </div>
 </div>
