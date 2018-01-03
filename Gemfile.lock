@@ -86,7 +86,6 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.10.2)
     multi_json (1.12.1)
-    mysql2 (0.4.6)
     net-ldap (0.16.0)
     nio4r (2.0.0)
     nokogiri (1.7.2)
@@ -193,4 +192,8 @@ DEPENDENCIES
   will_paginate (= 3.1.0)
 
 BUNDLED WITH
+<<<<<<< HEAD
    1.15.4
+=======
+   1.16.0
+>>>>>>> 0859b63937091097a73a4a93c06b61ca56f04441

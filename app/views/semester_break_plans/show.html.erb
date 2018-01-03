@@ -1,2 +1,61 @@
-<h1>SemesterBreakPlans#show</h1>
-<p>Find me in app/views/semester_break_plans/show.html.erb</p>
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Startdatum:</strong>
+  <%= german_dayname @semester_break_plan.start %>
+</p>
+
+<p>
+  <strong>Enddatum:</strong>
+  <%= german_dayname @semester_break_plan.end %>
+</p>
+
+<p>
+  <strong>Bezeichnung:</strong>
+  <%= @semester_break_plan.name %>
+</p>
+
+<%= form_for @semester_break_plan do |form| %>
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered">
+      <tr>
+        <% if is_admin? %>
+          <th colspan=1>Optionen</th>
+        <% end %>
+        <th colspan=1>Datum</th>
+        <% @users.each do |user| %>
+          <th colspan=1>
+            <div title=<%= user.get_name_or_alias %>><%= user.get_initial %> </div>
+          </th>
+
+        <% end %>
+
+      </tr>
+      <%= form.fields_for(:day_slots) do |form2| %>
+        <tr>
+          <% if is_admin? %>
+            <td><%= link_to 'Feiertag/Brückentag',  {:controller => "day_slots", :action => 'destroy', :id => form2.object.id, plan_id: @semester_break_plan.id}, :confirm => "Sind Sie sicher?", :method => :delete, tabindex: -1, class: "btn btn-sm btn-warning"  %></td>
+          <% end %>
+          <td> <%= german_dayname form2.object.start %></td>
+
+          <% i = 1 %>
+          <%= form2.fields_for(:semester_break_plan_connections) do |form3| %>
+            <td  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
+              <% if is_admin? || is_current? %>
+                <%= form3.number_field :availability, tabindex: i   %>
+              <% else %>
+                <%= form3.object.availability  %>
+              <% end %>
+
+              </td>
+            <% i += 1 %>
+          <% end %>
+        </tr>
+
+      <% end %>
+    </table>
+  </div>
+  <%= form.submit "Plan speichern", class: "brn btn-lg btn-success" %>
+<% end %>
+<%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan, type: 1), :method => :post %>
+<%= link_to "Manuell", solve_semester_break_plan_path(@semester_break_plan, type: 0), :method => :post %>

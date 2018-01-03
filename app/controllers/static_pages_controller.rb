@@ -5,5 +5,6 @@ class StaticPagesController < ApplicationController
       redirect_to login_path
     end
     @plans = SemesterPlan.where(inactive: false)
+    @plans_break = SemesterBreakPlan.where(inactive: false)
   end
 end

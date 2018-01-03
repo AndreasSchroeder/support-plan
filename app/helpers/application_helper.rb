@@ -1,5 +1,5 @@
 module ApplicationHelper
-    def get_collection s, co, plan
+  def get_collection s, co, plan
     @collection = []
     users = User.users_of_plan_without_office plan
     selected = false
@@ -24,6 +24,28 @@ module ApplicationHelper
     @collection
   end
 
+  def get_collection_break s, plan
+    @collection = []
+    users = plan.get_users
+    selected = false
+    users.each do |user|
+      if s[:user].to_i == user.id
+        selected = true
+        @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterBreakPlanConnection.find_plan_by_ids(user.id, (s[:slot].to_i())).availability}", selected: "" }]
+      elsif s[:slot]
+        @collection << [user.get_name_or_alias, user.id, {class: "av#{SemesterBreakPlanConnection.find_plan_by_ids(user.id, (s[:slot].to_i())).availability}" }]
+      else
+        @collection << [user.get_name_or_alias, user.id]
+      end
+    end
+    if !selected
+      @collection << ["(niemand)", nil, {selected: ""}]
+    else
+      @collection << ["(niemand)", nil]
+    end
+    @collection
+  end
+
   def get_av s, co
     if co && s[:co]
       return "av#{SemesterPlanConnection.find_it_id(s[:co].to_i, (s[:slot].to_i())).availability}"
@@ -35,6 +57,28 @@ module ApplicationHelper
 
   def get_av_user_slot user, slot
     return "av#{SemesterPlanConnection.find_it(user, slot).availability}"
+  end
+
+  def get_av_break s, co
+    if co && s[:co]
+      return "av#{SemesterBreakPlanConnection.find_plan_by_ids(s[:co].to_i, (s[:slot].to_i())).availability}"
+    elsif !co && s[:user]
+      return "av#{SemesterBreakPlanConnection.find_plan_by_ids(s[:user].to_i, (s[:slot].to_i())).availability}"
+    end
+    return ""
+  end
+
+  def get_av_user_slot_break user, slot
+    if slot && user
+      con = SemesterBreakPlanConnection.find_plan_by_ids(user, slot)
+      if con
+        return "av#{con.availability}"
+      else
+        return "av0"
+      end
+    else
+      return "av0"
+    end
   end
 
   def meeting_collection scores, plan
@@ -76,6 +120,39 @@ module ApplicationHelper
   def german_day time
     if time
       return time.strftime("%d.%m.%Y")
+    else
+      return "Keine Zeit vorhanden"
+    end
+  end
+
+  def german_dayname time
+    if time
+      dayname= ""
+      case time.wday
+      when 0
+        dayname = "So"
+      when 1
+        dayname = "Mo"
+      when 2
+        dayname = "Di"
+      when 3
+        dayname = "Mi"
+      when 4
+        dayname = "Do"
+      when 5
+        dayname = "Fr"
+      when 6
+        dayname = "Sa"
+      end
+      return "#{dayname} #{time.strftime('%d.%m.%Y')}"
+    else
+      return "Keine Zeit vorhanden"
+    end
+  end
+
+  def parse_day time
+    if time
+      return time.strftime("%Y-%m-%d")
     else
       return "Keine Zeit vorhanden"
     end

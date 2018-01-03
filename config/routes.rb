@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+
+  delete '/day_slots/:id/destroy', to: 'day_slots#destroy'
+
   get 'semester_break_plans/index'
 
   get 'semester_break_plans/show'
@@ -22,6 +25,16 @@ Rails.application.routes.draw do
 
   resources :users,            only: [:destroy, :index, :show]
   resources :semester_plans,   only: [:new, :create, :destroy, :show]
-  resources :semester_break_plans,   only: [:new, :create, :destroy, :show]
+  resources :semester_break_plans,   only: [:new, :create, :destroy, :edit, :update, :show] do
+    member do
+      post '/solve', to: 'semester_break_plan_solvers#solve', as: 'solve'
+      get '/fixed', to: 'semester_break_plan_solvers#fixed', as: 'fixed'
+      post '/fixed', to: 'semester_break_plan_solvers#fix', as: 'fix'
+      delete '/fixed', to: 'semester_break_plan_solvers#delete_solution', as: 'del_sol'
+      get '/solve', to: 'semester_break_plan_solvers#show', as: 'valid_break'
+      patch '/solve', to: 'semester_break_plan_solvers#update'
+    end
+  end
+  resources :holidays
 
 end

@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Feiertage</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Datum</th>
+      <th>Name</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @holidays.each do |holiday| %>
+      <tr>
+        <td><%= german_day holiday.day %></td>
+        <td><%= holiday.name %></td>
+        <td><%= link_to 'Anzeigen', holiday, class: "btn btn-sm btn-primary" %></td>
+        <td><%= link_to 'Bearbeiten', edit_holiday_path(holiday), class: "btn btn-sm btn-success" %></td>
+        <td><%= link_to 'Löschen', holiday, method: :delete, data: { confirm: 'Sind Sie sicher, dass sie den Feiertag löschen möchten?' }, class: "btn btn-sm btn-danger" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'Neuen Feiertag erstellen', new_holiday_path, class: "btn btn-lg btn-success" %>

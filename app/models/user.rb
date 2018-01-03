@@ -71,10 +71,21 @@ class User < ApplicationRecord
     return self.planable
   end
 
+  def is_planable_break? plan
+    plan.day_slots.each do |slot|
+      slot.semester_break_plan_connections.each do |con|
+        if con.user == self
+          return true
+        end
+      end
+    end
+    return self.planable
+  end
+
   def self.users_of_plan_pure plan
     users = []
     User.all.each do |user|
-      if user.is_planable?(plan) 
+      if user.is_planable?(plan)
         users << user
       end
     end
@@ -91,6 +102,21 @@ class User < ApplicationRecord
     users = []
     User.all.each do |user|
       if user.is_planable?(plan) && plan.has_entrys(user)
+        users << user
+      end
+    end
+    User.all.each do |user|
+      if user.office
+        users << user
+      end
+    end
+    users.uniq
+  end
+
+  def self.users_of_break_plan plan
+    users = []
+    User.all.each do |user|
+      if user.is_planable_break? plan
         users << user
       end
     end
@@ -120,13 +146,13 @@ class User < ApplicationRecord
   end
 
   # returns the sum of all hours of planable users
-  def self.hours_sum
-    User.where(planable: true).inject(0){|sum,x| sum + x.hours.to_i }
+  def self.hours_sum users
+    users.inject(0){|sum,x| sum + x.hours.to_i }
   end
 
   # returns the sum of the shifts (rounded)
-  def self.shifts_sum
-    User.where(planable: true).inject(0){|sum,x| sum + x.get_shifts_round.to_i }
+  def self.shifts_sum amount, users
+    users.inject(0){|sum,x| sum + x.get_shifts_round(amount, users).to_i }
   end
 
   # return hours of user
@@ -135,40 +161,53 @@ class User < ApplicationRecord
   end
 
   # returns shift qut
-  def get_shift_quot
-    ((20.to_f/User.hours_sum.to_f) * self.get_hours.to_f).to_f
+  def get_shift_quot amount, users
+    ((amount.to_f/User.hours_sum(users).to_f) * self.get_hours.to_f).to_f
   end
 
   # rounds shifts
-  def get_shifts_round
-    (self.get_shift_quot + 0.5).to_i
+  def get_shifts_round amount, users
+    (self.get_shift_quot(amount, users) + 0.5).to_i
   end
 
   # returns hash with amount of shifts per supporter
-  def self.supporter_amount_of_shifts
+  def self.supporter_amount_of_shifts amount, users
     rnd = Random.new
     # initialize and fill
     shifts = []
-    User.where(planable: true, inactive: false).each do |user|
-      shifts << {user: user.id, shifts: user.get_shifts_round}
+
+    users.each do |user|
+      shifts << {user: user.id, shifts: user.get_shifts_round(amount, users)}
     end
     # sum up
-    sum = User.shifts_sum
+    sum = User.shifts_sum(amount, users)
 
     # flatten hash, so sum is 20
-    while sum > 20
+    while sum > amount
       shifts.sort_by! { |item|
         [item[:shifts]* -1 , User.find(item[:user]).hours, rnd.rand ]
       }
       shifts[0][:shifts] -= 1
       sum -=1
     end
-    while sum < 20
+    while sum < amount
       shifts.sort_by! { |item|
         [item[:shifts] , User.find(item[:user]).hours * -1, rnd.rand]
       }
       shifts[0][:shifts] += 1
       sum +=1
+    end
+    shifts.sort_by! { |item|
+        [item[:shifts] * -1 , rnd.rand]
+      }
+    if users.size <= amount
+      while lazy = shifts.detect{|shift| shift[:shifts] == 0}
+        shifts[0][:shifts] -= 1
+        lazy[:shifts] += 1
+        shifts.sort_by! { |item|
+          [item[:shifts] * -1 , rnd.rand]
+        }
+      end
 
     end
     #return hash
@@ -185,60 +224,7 @@ class User < ApplicationRecord
     shifts
   end
 
-  # returns hash with amaount of shifts for each supporter
-  # old version.
-  def self.supporter_amount_of_shifts_old
-    # initialize hash
-    shifts = []
-    User.where(planable: true).each do |user|
-      shifts << {user: user.id, shifts: user.get_shifts_round}
-    end
-    sum = User.shifts_sum
-    rnd = Random.new
 
-    # if to much hours, eleminate some
-    if sum >20
-      dif =  sum - 20
-
-      # get all users with minimal hours
-      set = User.min_supporters dif
-      len = set.length() -1
-
-      # repeat until diff = 0
-      while dif != 0
-         # minor chance to elimate shift from any supporter
-        i = rnd.rand(0..(len))
-        any = set[i].id
-        users = shifts.select{|u| u[:user] == any  }
-        if users.first[:shifts] > 1
-          users.first[:shifts] -= 1
-          dif -= 1
-          set.delete_at(i)
-          len -= 1
-        end
-      end
-
-    # analog as above
-    elsif sum < 20
-      dif =   20 - sum
-      set = User.max_supporters dif
-      len = set.length() -1
-
-      while dif != 0
-
-        i = rnd.rand(0..(len))
-        any = set[i].id
-        users = shifts.select{|u| u[:user] == any  }
-        if users.first[:shifts] > 1
-          users.first[:shifts] += 1
-          dif -= 1
-          set.delete_at(i)
-          len -= 1
-        end
-      end
-    end
-    shifts
-  end
 
   # gets all supporters with minimal hours
   def self.min_supporters(diff )
