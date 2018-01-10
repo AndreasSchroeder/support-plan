@@ -176,7 +176,7 @@ DEPENDENCIES
   coffee-rails (~> 4.2)
   jbuilder (~> 2.5)
   jquery-rails
-  listen (~> 3.0.5)
+  listen
   mysql2 (>= 0.3.18, < 0.5)
   net-ldap
   openssl
@@ -193,4 +193,4 @@ DEPENDENCIES
   will_paginate (= 3.1.0)
 
 BUNDLED WITH
-   1.15.0
+   1.15.4

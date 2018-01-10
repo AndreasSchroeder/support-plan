@@ -58,7 +58,8 @@ class ApplicationController < ActionController::Base
     # searchs database for a user with uni-adresse
     def checks_email_alternativ (email)
         array = email.split("@")
-        if array.last.downcase == "uni-osnabrueck.de" || array.last.downcase == "uos.de"
+        p "DOMAIN: #{array.last.downcase}"
+        if array.last.downcase.strip == "uni-osnabrueck.de" || array.last.downcase.strip == "uos.de"
             mail = array.first + "@uni-osnabrueck.de"
             @user = User.find_by(email: mail)
             if !@user

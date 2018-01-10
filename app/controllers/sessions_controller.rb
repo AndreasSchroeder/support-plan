@@ -25,6 +25,9 @@ class SessionsController < ApplicationController
           # connects to rz-database
           if connect(uname, params[:session][:password], user)
             log_in user
+            if (user.inactive)
+              user.update(inactive: false)
+            end
             flash[:success] = 'Erfolgreich eingeloggt'
           else
             flash[:danger] = 'Passwort nicht korrekt'
