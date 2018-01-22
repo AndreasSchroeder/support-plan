@@ -24,7 +24,11 @@ Rails.application.routes.draw do
   get   'users/new'
 
   resources :users,            only: [:destroy, :index, :show]
-  resources :semester_plans,   only: [:new, :create, :destroy, :show]
+  resources :semester_plans,   only: [:new, :create, :destroy, :show] do
+    member do
+      post 'comment'. to: 'semester_plans#comment'
+    end
+  end
   resources :semester_break_plans,   only: [:new, :create, :destroy, :edit, :update, :show] do
     member do
       post '/solve', to: 'semester_break_plan_solvers#solve', as: 'solve'
@@ -33,6 +37,7 @@ Rails.application.routes.draw do
       delete '/fixed', to: 'semester_break_plan_solvers#delete_solution', as: 'del_sol'
       get '/solve', to: 'semester_break_plan_solvers#show', as: 'valid_break'
       patch '/solve', to: 'semester_break_plan_solvers#update'
+      post 'comment'. to: 'semester_break_plans#comment'
     end
   end
   resources :holidays

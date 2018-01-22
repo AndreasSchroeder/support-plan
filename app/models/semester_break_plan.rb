@@ -48,7 +48,8 @@ class SemesterBreakPlan < ApplicationRecord
     best = nil
     best_sol = []
     # get users
-    users = User.users_of_break_plan(self)
+    without = User.where(inactive: true).to_a + User.where(office: true)
+    users = User.users_of_break_plan(self) - without
     i = 0
     while i < 30
       #initialize iteration
@@ -196,13 +197,22 @@ class SemesterBreakPlan < ApplicationRecord
     users = []
     self.day_slots.each do |slot|
       slot.semester_break_plan_connections.each do |con|
-        users << con.user
-        users.uniq!
+        if !con.user.inactive
+          users << con.user
+        elsif self.solution
+          eval(self.solution).each do |slot|
+            if slot[:user] == con.user.id
+              users << con.user
+            end
+          end
+        end
       end
     end
+    users.uniq!
     users
 
   end
+
 
   # updates users
   def update_users

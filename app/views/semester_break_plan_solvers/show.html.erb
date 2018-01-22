@@ -13,7 +13,7 @@
           <th>Tag</th>
           <th>Supporter</th>
           <th></th>
-          <% @plan.get_users.each do |user| %>
+          <% (@plan.get_users).each do |user| %>
             <th><div title=<%= user.get_name_or_alias %>><%= user.get_initial %> </div></th>
           <% end %>
         </tr>
@@ -113,6 +113,10 @@
   <% end %>
   <h3> Gütevergleich </h3>
   <h4> Zuletzt berechnete Lösung: <%= @plan.get_fitness(eval(@plan.solution)) %></h4>
-  <h4> Fixierte Lösung: <%= @plan.get_fitness(eval(@plan.fixed_solution)) %></h4>
+  <% if @plan.fixed_solution %>
+    <h4> Fixierte Lösung: <%= @plan.get_fitness(eval(@plan.fixed_solution)) %></h4>
+  <% else %>
+
+  <% end %>
 
 </div>

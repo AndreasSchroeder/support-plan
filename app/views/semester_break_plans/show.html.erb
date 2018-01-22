@@ -40,15 +40,17 @@
 
           <% i = 1 %>
           <%= form2.fields_for(:semester_break_plan_connections) do |form3| %>
-            <td  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
-              <% if is_admin? || is_current? %>
-                <%= form3.number_field :availability, tabindex: i   %>
-              <% else %>
-                <%= form3.object.availability  %>
-              <% end %>
+            <% if form3.object.user && form3.objects.day_slot %>
+              <td  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
+                <% if is_admin? || is_current? %>
+                  <%= form3.number_field :availability, tabindex: i   %>
+                <% else %>
+                  <%= form3.object.availability  %>
+                <% end %>
 
-              </td>
-            <% i += 1 %>
+                </td>
+              <% i += 1 %>
+            <% end %>
           <% end %>
         </tr>
 
