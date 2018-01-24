@@ -40,9 +40,9 @@
 
           <% i = 1 %>
           <%= form2.fields_for(:semester_break_plan_connections) do |form3| %>
-            <% if form3.object.user && form3.objects.day_slot %>
+            <% if form3.object.user && form3.object.day_slot %>
               <td  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
-                <% if is_admin? || is_current? %>
+                <% if is_admin? || current_user == form3.object.user %>
                   <%= form3.number_field :availability, tabindex: i   %>
                 <% else %>
                   <%= form3.object.availability  %>
@@ -59,5 +59,7 @@
   </div>
   <%= form.submit "Plan speichern", class: "brn btn-lg btn-success" %>
 <% end %>
-<%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan, type: 1), :method => :post %>
-<%= link_to "Manuell", solve_semester_break_plan_path(@semester_break_plan, type: 0), :method => :post %>
+<% if is_admin? %>
+  <%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan, type: 1), :method => :post %>
+  <%= link_to "Manuell", solve_semester_break_plan_path(@semester_break_plan, type: 0), :method => :post %>
+<% end %>

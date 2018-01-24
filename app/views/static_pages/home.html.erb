@@ -20,8 +20,20 @@
       <% @plans.each do |plan| %>
         <div class="col-md-6 well">
           <h4>
-            <%= link_to "#{plan.name}" , semester_plan_path(plan.id), class: "btn btn-sm btn-primary" %>
+            <%= "#{plan.name}"%>
           </h4>
+          <p>
+            <%= link_to "Verfügbarkeiten eintragen" , semester_plan_path(plan.id), class: "btn btn-sm btn-primary" %>
+          </p>
+          <% if plan.fixed_solution != nil %>
+            <p>
+              <%= link_to "Supportplan" , valid_path(plan.id), class: "btn btn-sm btn-success" %>
+            </p>
+            <p>
+              <%= link_to "PDF" , pdf_semester_plan_path(plan.id), class: "btn btn-sm btn-success" %>
+            </p>
+
+          <% end %>
           <% if plan.meeting_day %>
             <p>
               <%= "Treffen #{plan.meeting_day} um #{plan.meeting_time}:00Uhr." %>
@@ -37,14 +49,27 @@
           <p>
             Ende: <%= german_day plan.end %>
           </p>
-          <% if plan.fixed_solution != nil %>
-            <h4>
-              <%= link_to "Einteilung" , valid_path(plan.id), class: "btn btn-sm btn-success" %>
-            </h4>
-
-          <% end %>
           <% if is_admin? %>
+            <%= form_for(plan) do |f| %>
+              <div class="field">
+                <%= f.label "Bemerkung" %>
+                <%= f.text_field :comment, value: plan.comment %>
+              </div>
+              <% if plan.fixed_solution %>
+                <div class="field">
+                  <%= f.label "Meeting" %>
+                  <%= f.select :meeting_day, options_for_select(meeting_collection plan.best_meeting_dates, plan) %>
+                </div>
+              <% end %>
+              <div class="actions">
+                <%= f.submit "Werte übernehmen", class: "btn btn-sm btn-success" %>
+              </div>
+            <% end %>
             <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-sm btn-danger" %>
+          <% else %>
+            <p>
+              Bemerkung: <br><%= plan.comment %>
+            </p>
           <% end %>
         </div>
       <% end %>
@@ -58,24 +83,43 @@
       <% @plans_break.each do |plan| %>
         <div class="col-md-6 well">
           <h4>
-            <%= link_to "#{plan.name}" , semester_break_plan_path(plan.id), class: "btn btn-sm btn-primary" %>
+            <%= "#{plan.name}" %>
           </h4>
+          <p>
+            <%= link_to "#Verfügbarkeiten eintragen" , semester_break_plan_path(plan.id), class: "btn btn-sm btn-primary" %>
+          </p>
+        <% if plan.fixed_solution%>
+          <p>
+            <%= link_to "Supportplan" , solve_semester_break_plan_path(plan.id), class: "btn btn-sm btn-success" %>
+          </p>
+          <p>
+            <%= link_to "PDF" , pdf_semester_break_plan_path(plan.id), class: "btn btn-sm btn-success" %>
+          </p>
+        <% end %>
           <p>
             Start: <%= german_day plan.start %>
           </p>
           <p>
             Ende: <%= german_day plan.end %>
           </p>
-          <% if plan.fixed_solution%>
-            <h4>
-              <%= link_to "Einteilung" , solve_semester_break_plan_path(plan.id), class: "btn btn-sm btn-success" %>
-            </h4>
-
-          <% end %>
           <% if is_admin? %>
-            <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-sm btn-danger" %>
-          <% end %>
-        </div>
+            <%= form_for(plan) do |f| %>
+              <div class="field">
+                <%= f.label "Bemerkung" %>
+                <%= f.text_field :comment, value: plan.comment %>
+              </div>
+
+              <div class="actions">
+                <%= f.submit "Kommentar hinzufügen", class: "btn btn-sm btn-success" %>
+              </div>
+              <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-sm btn-danger" %>
+            <% end %>
+          <% else %>
+            <p>
+              Bemerkung: <br><%= plan.comment %>
+            </p>
+          <%= button_to 'Plan löschen', plan, method: :delete, data: { confirm: "Soll dieser Plan wirklich entfernt werden?" } , class: "btn btn-sm btn-danger" %>
+        <% end %>
       <% end %>
     </div>
   <% end %>

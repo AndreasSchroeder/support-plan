@@ -88,13 +88,33 @@ class SemesterPlansController < ApplicationController
 
 
   end
+  def update
+    if SemesterPlan.find(params[:id]).update(plan_params)
+      p "Plan: #{params[:semester_plan]}"
+      p "Meeting: #{params[:semester_plan][:meeting_day]}"
+      if params[:semester_plan][:meeting_day]
+        day = params[:semester_plan][:meeting_day].split(";").first
+        time = params[:semester_plan][:meeting_day].split(";").last
+          SemesterPlan.find(params[:id]).update(meeting_day: day, meeting_time: time.to_i)
+      end
+      flash[:success] = "Ferien-Support-Plan aktualisiert."
+      redirect_to root_path
+    else
+      render :edit
+    end
+  end
 
+  def pdf
+    @plan = SemesterPlan.find(params[:id])
+    pdf = SemesterPlanPdf.new(@plan)
+    send_data pdf.render, filename: "#{@plan.name}.pdf".gsub(/\s+/, ""), type: 'application/pdf'
+  end
 
 
   private
   # whitelistet parameters
   def plan_params
-    params.require(:semester_plan).permit(:start, :end, :name)
+    params.require(:semester_plan).permit(:start, :end, :name, :comment, :meeting_day)
   end
 
   # Confirms a logged-in user.
