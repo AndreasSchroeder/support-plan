@@ -25,4 +25,12 @@ class DaySlot < ApplicationRecord
   def create_holiday
   	Holiday.create(day: self.start, name: "Feiertag/Brückentag")
   end
+
+  def get_users
+    if self.semester_break_plan_connections.any?
+      return self.semester_break_plan_connections.map{|con| con.user}
+    else
+      return []
+    end	
+  end
 end

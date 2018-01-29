@@ -30,8 +30,7 @@ class ApplicationController < ActionController::Base
         ldap.search( :base => treebase, :filter => filter ) do |entry|
             given_name = build entry.givenName
             last_name =  build entry.sn
-            mail =       build entry.mail
-            user.update_attribute :email, mail
+            user.update_attribute :email, "#{name}@uos.de"
             user.update_attribute :first_name, given_name
             user.update_attribute :last_name, last_name
             user.save

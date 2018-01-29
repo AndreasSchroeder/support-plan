@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
     # filters
     before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy]
-    before_action :admin_user, only: [:index, :edit, :destroy]
+    before_action :admin_user, only: [ :edit, :destroy]
 
   # lists all users
   def index

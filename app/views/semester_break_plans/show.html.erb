@@ -2,12 +2,12 @@
 
 <p>
   <strong>Startdatum:</strong>
-  <%= german_dayname @semester_break_plan.start %>
+  <%= german_dayname @semester_break_plan.start.to_datetime %>
 </p>
 
 <p>
   <strong>Enddatum:</strong>
-  <%= german_dayname @semester_break_plan.end %>
+  <%= german_dayname @semester_break_plan.end.to_datetime %>
 </p>
 
 <p>
@@ -23,7 +23,7 @@
           <th colspan=1>Optionen</th>
         <% end %>
         <th colspan=1>Datum</th>
-        <% @users.each do |user| %>
+        <% @semester_break_plan.day_slots.first.get_users.each do |user| %>
           <th colspan=1>
             <div title=<%= user.get_name_or_alias %>><%= user.get_initial %> </div>
           </th>
@@ -36,19 +36,23 @@
           <% if is_admin? %>
             <td><%= link_to 'Feiertag/Brückentag',  {:controller => "day_slots", :action => 'destroy', :id => form2.object.id, plan_id: @semester_break_plan.id}, :confirm => "Sind Sie sicher?", :method => :delete, tabindex: -1, class: "btn btn-sm btn-warning"  %></td>
           <% end %>
-          <td> <%= german_dayname form2.object.start %></td>
+          <td> <%= german_dayname form2.object.start.to_datetime %></td>
 
           <% i = 1 %>
           <%= form2.fields_for(:semester_break_plan_connections) do |form3| %>
-            <td  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
-              <% if is_admin? || is_current? %>
-                <%= form3.number_field :availability, tabindex: i   %>
-              <% else %>
-                <%= form3.object.availability  %>
-              <% end %>
+            <% if form3.object.user && form3.object.day_slot %>
+              <div title=<%= form3.object.user.get_name_or_alias %>>
+                <td title=<%= form3.object.user.get_name_or_alias %>  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
+                  <% if is_admin? || current_user == form3.object.user %>
+                    <%= form3.number_field :availability, tabindex: i   %>
+                  <% else %>
+                    <%= form3.object.availability  %>
+                  <% end %>
 
-              </td>
-            <% i += 1 %>
+                </td>
+                <% i += 1 %>
+              </div>
+            <% end %>
           <% end %>
         </tr>
 
@@ -57,5 +61,7 @@
   </div>
   <%= form.submit "Plan speichern", class: "brn btn-lg btn-success" %>
 <% end %>
-<%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan, type: 1), :method => :post %>
-<%= link_to "Manuell", solve_semester_break_plan_path(@semester_break_plan, type: 0), :method => :post %>
+<% if is_admin? %>
+  <%= link_to "Lösen", solve_semester_break_plan_path(@semester_break_plan, type: 1), :method => :post, class: "btn btn-lg btn-success" %>
+  <%= link_to "Manuell", solve_semester_break_plan_path(@semester_break_plan, type: 0), :method => :post, class: "btn btn-lg btn-success" %>
+<% end %>

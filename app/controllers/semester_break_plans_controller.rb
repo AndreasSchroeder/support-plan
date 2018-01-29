@@ -27,7 +27,7 @@ class SemesterBreakPlansController < ApplicationController
     @semester_break_plan = SemesterBreakPlan.new(semester_break_plan_params)
     @users = User.users_of_break_plan @semester_break_plan
     if @semester_break_plan.save
-      days = DaySlot.days_between @semester_break_plan.start, @semester_break_plan.end
+      days = DaySlot.days_between @semester_break_plan.start.to_datetime, @semester_break_plan.end.to_datetime
       days.each do |day|
         slot = @semester_break_plan.day_slots.create(start: parse_day(day))
         @users.each do |user|
@@ -45,7 +45,7 @@ class SemesterBreakPlansController < ApplicationController
   def update
     if @semester_break_plan.update(semester_break_plan_params)
       flash[:success] = "Ferien-Support-Plan aktualisiert."
-      redirect_to @semester_break_plan
+      redirect_to :back
     else
       render :edit
     end
@@ -57,6 +57,13 @@ class SemesterBreakPlansController < ApplicationController
     flash[:success] = "Ferien-Support-Plan gelöscht."
     redirect_to root_path
   end
+
+  def pdf
+    @plan = SemesterBreakPlan.find(params[:id])
+    pdf = SemesterBreakPlanPdf.new(@plan)
+    send_data pdf.render, filename: "#{@plan.name}.pdf".gsub(/\s+/, ""), type: 'application/pdf'
+  end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -72,7 +79,7 @@ class SemesterBreakPlansController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def semester_break_plan_params
-      params.require(:semester_break_plan).permit(:start, :end, :name, :free, :solution, day_slots_attributes: [:semester_break_plan_id, :id, semester_break_plan_connections_attributes:[:id, :availability, :user_id, :day_slot_id]])
+      params.require(:semester_break_plan).permit(:start, :end, :comment, :name, :free, :solution, day_slots_attributes: [:semester_break_plan_id, :id, semester_break_plan_connections_attributes:[:id, :availability, :user_id, :day_slot_id]])
     end
 
     # Confirms an admin user.

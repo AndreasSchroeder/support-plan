@@ -7,23 +7,31 @@
 #   gem 'mysql2'
 #
 # And be sure to use new-style password hashing:
+
+
 #   http://dev.mysql.com/doc/refman/5.7/en/old-client.html
 #
+
+
+
 default: &default
-  adapter: sqlite3
+  adapter: mysql2
   encoding: utf8
   pool: 5
+  username: root
+  password: DMi1sP!!!
+  socket: /var/run/mysqld/mysqld.sock
 
 development:
   <<: *default
-  database: db/support-plan_development.sqlite3
+  database: support-plan_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: db/support-plan_test.sqlite3
+  database: support-plan_test
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -47,5 +55,4 @@ test:
 production:
   <<: *default
   database: support-plan_production
-  username: support-plan
-  password: <%= ENV['SUPPORT-PLAN_DATABASE_PASSWORD'] %>
+  

@@ -53,7 +53,7 @@ class User < ApplicationRecord
 
   def get_initial
     if self.first_name.nil? || self.last_name.nil?
-      return "11"
+      return "#{self.email.first(2).upcase}"
     else
       return "#{self.first_name.first.upcase}#{self.last_name.first.upcase}"
     end
