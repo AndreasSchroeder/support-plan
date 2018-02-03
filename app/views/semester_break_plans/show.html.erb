@@ -2,12 +2,12 @@
 
 <p>
   <strong>Startdatum:</strong>
-  <%= german_dayname @semester_break_plan.start %>
+  <%= german_dayname @semester_break_plan.start.to_datetime %>
 </p>
 
 <p>
   <strong>Enddatum:</strong>
-  <%= german_dayname @semester_break_plan.end %>
+  <%= german_dayname @semester_break_plan.end.to_datetime %>
 </p>
 
 <p>
@@ -36,7 +36,7 @@
           <% if is_admin? %>
             <td><%= link_to 'Feiertag/Brückentag',  {:controller => "day_slots", :action => 'destroy', :id => form2.object.id, plan_id: @semester_break_plan.id}, :confirm => "Sind Sie sicher?", :method => :delete, tabindex: -1, class: "btn btn-sm btn-warning"  %></td>
           <% end %>
-          <td> <%= german_dayname form2.object.start %></td>
+          <td> <%= german_dayname form2.object.start.to_datetime %></td>
 
           <% i = 1 %>
           <%= form2.fields_for(:semester_break_plan_connections) do |form3| %>

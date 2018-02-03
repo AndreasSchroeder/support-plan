@@ -27,7 +27,7 @@ class SemesterBreakPlansController < ApplicationController
     @semester_break_plan = SemesterBreakPlan.new(semester_break_plan_params)
     @users = User.users_of_break_plan @semester_break_plan
     if @semester_break_plan.save
-      days = DaySlot.days_between @semester_break_plan.start, @semester_break_plan.end
+      days = DaySlot.days_between @semester_break_plan.start.to_datetime, @semester_break_plan.end.to_datetime
       days.each do |day|
         slot = @semester_break_plan.day_slots.create(start: parse_day(day))
         @users.each do |user|
