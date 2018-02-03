@@ -18,8 +18,6 @@ gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
 # See https://github.com/rails/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
-
 # Use jquery as the JavaScript library
 gem "passenger"
 gem "sqlite3"
@@ -30,27 +28,19 @@ gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 3.0'
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
-
 
 # Style gem from twitter
 gem 'bootstrap-sass', '3.3.6'
 
 gem 'bootstrap-datepicker-rails'
 
-# Nur 30 User pro seite
-gem 'will_paginate',           '3.1.0'
-gem 'bootstrap-will_paginate', '0.0.10'
-
 # LDAP
 gem 'net-ldap'
 gem 'openssl'
+
+# PDF
+gem 'prawn'
+gem 'prawn-table'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

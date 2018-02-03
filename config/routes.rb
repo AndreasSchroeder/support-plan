@@ -24,9 +24,14 @@ Rails.application.routes.draw do
   get   'users/new'
 
   resources :users,            only: [:destroy, :index, :show]
-  resources :semester_plans,   only: [:new, :create, :destroy, :show]
+  resources :semester_plans,   only: [:new, :create, :destroy, :show, :update] do
+    member do
+      get '/pdf', to: 'semester_plans#pdf'
+    end
+  end
   resources :semester_break_plans,   only: [:new, :create, :destroy, :edit, :update, :show] do
     member do
+      get '/pdf', to: 'semester_break_plans#pdf'
       post '/solve', to: 'semester_break_plan_solvers#solve', as: 'solve'
       get '/fixed', to: 'semester_break_plan_solvers#fixed', as: 'fixed'
       post '/fixed', to: 'semester_break_plan_solvers#fix', as: 'fix'

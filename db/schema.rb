@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171221112829) do
+ActiveRecord::Schema.define(version: 20180122142035) do
 
   create_table "day_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.date     "start"
@@ -42,12 +42,13 @@ ActiveRecord::Schema.define(version: 20171221112829) do
     t.date     "start"
     t.date     "end"
     t.string   "name"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-    t.boolean  "free",                         default: false
-    t.text     "solution",       limit: 65535
-    t.boolean  "inactive",                     default: false
-    t.text     "fixed_solution", limit: 65535
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.boolean  "free",           default: false
+    t.text     "solution"
+    t.boolean  "inactive",       default: false
+    t.text     "fixed_solution"
+    t.text     "comment"
   end
 
   create_table "semester_plan_connections", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -71,8 +72,9 @@ ActiveRecord::Schema.define(version: 20171221112829) do
     t.text     "solution",       limit: 65535
     t.string   "meeting_day"
     t.integer  "meeting_time"
-    t.text     "fixed_solution", limit: 65535
-    t.boolean  "inactive",                     default: false
+    t.text     "fixed_solution"
+    t.boolean  "inactive",       default: false
+    t.text     "comment"
   end
 
   create_table "time_slots", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

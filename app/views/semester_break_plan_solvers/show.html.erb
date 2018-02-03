@@ -7,13 +7,21 @@
 
 <div class=row >
   <div class=col-lg-12>
+    <% if @plan.fixed_solution %>
+      <p>
+        <%= link_to "Plan als PDF herunterladen" , pdf_semester_break_plan_path(@plan.id), class: "btn btn-lg btn-success" %>
+      </p>
+    <% end %>
+  </div>
+  <div class=col-lg-12>
+
     <%= form_for(@plan, :url => {:controller => 'semester_break_plan_solvers', :action => 'update'}, method: "patch") do |f| %>
 
       <table class="table-hover table-bordered table">
           <th>Tag</th>
           <th>Supporter</th>
           <th></th>
-          <% @plan.get_users.each do |user| %>
+          <% (@plan.get_users).each do |user| %>
             <th><div title=<%= user.get_name_or_alias %>><%= user.get_initial %> </div></th>
           <% end %>
         </tr>
@@ -94,25 +102,40 @@
         <% end %>
       </table>
       <%= f.hidden_field "type", value: @type %>
-      <div class=col-lg-6>
-        <%= f.submit :Übernehmen, class:"btn btn-lg btn-success"%>
-      </div>
+      <% if is_admin? %>
+        <div class=col-lg-6>
+          <%= f.submit :Übernehmen, class:"btn btn-lg btn-success"%>
+        </div>
+      <% end %>
     <% end %>
   </div>
-  <h3> Optionen </h3>
-  <% if @type == 0 %>
-    <div>
-      <%= link_to "Fixierte Lösung anzeigen", fixed_semester_break_plan_path(@plan), class: "btn btn-lg btn-info"%>
-      <%= link_to "Diese Lösung fixieren", fix_semester_break_plan_path(@plan), class: "btn btn-lg btn-primary", method: 'post'%>
-    </div>
-  <% else %>
-    <div>
-      <%= link_to "Als letztes berechnete Lösung anzeigen", solve_semester_break_plan_path(@plan), class: "btn btn-lg btn-info"%>
-      <%= link_to "Fixierte Lösung löschen", del_sol_semester_break_plan_path(@plan), class: "btn btn-lg btn-danger", method: 'delete'%>
-    </div>
+  <div class=col-lg-12>
+    <% if @plan.fixed_solution %>
+      <p>
+        <%= link_to "Plan als PDF herunterladen" , pdf_semester_break_plan_path(@plan.id), class: "btn btn-lg btn-success" %>
+      </p>
+    <% end %>
+  </div>
+  <% if is_admin? %>
+    <h3> Optionen </h3>
+    <% if @type == 0 %>
+      <div>
+        <%= link_to "Fixierte Lösung anzeigen", fixed_semester_break_plan_path(@plan), class: "btn btn-lg btn-info"%>
+        <%= link_to "Diese Lösung fixieren", fix_semester_break_plan_path(@plan), class: "btn btn-lg btn-primary", method: 'post'%>
+      </div>
+    <% else %>
+      <div>
+        <%= link_to "Als letztes berechnete Lösung anzeigen", solve_semester_break_plan_path(@plan), class: "btn btn-lg btn-info"%>
+        <%= link_to "Fixierte Lösung löschen", del_sol_semester_break_plan_path(@plan), class: "btn btn-lg btn-danger", method: 'delete'%>
+      </div>
+    <% end %>
+    <h3> Gütevergleich </h3>
+    <h4> Zuletzt berechnete Lösung: <%= @plan.get_fitness(eval(@plan.solution)) %></h4>
+    <% if @plan.fixed_solution %>
+      <h4> Fixierte Lösung: <%= @plan.get_fitness(eval(@plan.fixed_solution)) %></h4>
+    <% else %>
+
+    <% end %>
   <% end %>
-  <h3> Gütevergleich </h3>
-  <h4> Zuletzt berechnete Lösung: <%= @plan.get_fitness(eval(@plan.solution)) %></h4>
-  <h4> Fixierte Lösung: <%= @plan.get_fitness(eval(@plan.fixed_solution)) %></h4>
 
 </div>
