@@ -23,7 +23,7 @@
           <th colspan=1>Optionen</th>
         <% end %>
         <th colspan=1>Datum</th>
-        <% @users.each do |user| %>
+        <% @semester_break_plan.day_slots.first.get_users.each do |user| %>
           <th colspan=1>
             <div title=<%= user.get_name_or_alias %>><%= user.get_initial %> </div>
           </th>
@@ -41,15 +41,17 @@
           <% i = 1 %>
           <%= form2.fields_for(:semester_break_plan_connections) do |form3| %>
             <% if form3.object.user && form3.object.day_slot %>
-              <td  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
-                <% if is_admin? || current_user == form3.object.user %>
-                  <%= form3.number_field :availability, tabindex: i   %>
-                <% else %>
-                  <%= form3.object.availability  %>
-                <% end %>
+              <div title=<%= form3.object.user.get_name_or_alias %>>
+                <td title=<%= form3.object.user.get_name_or_alias %>  class=<%= get_av_user_slot_break form3.object.user.id, form3.object.day_slot.id %>>
+                  <% if is_admin? || current_user == form3.object.user %>
+                    <%= form3.number_field :availability, tabindex: i   %>
+                  <% else %>
+                    <%= form3.object.availability  %>
+                  <% end %>
 
                 </td>
-              <% i += 1 %>
+                <% i += 1 %>
+              </div>
             <% end %>
           <% end %>
         </tr>

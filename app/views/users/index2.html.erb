@@ -1,0 +1,28 @@
+<div class="Benutzer hinzufügen">
+  <h1>Benutzerverwaltung</h1>
+  <div class="row well">
+    <p>
+      Um einen Benutzer hinzuzufügen muss die Uni-Email-Adresse des Benutzers eingegeben werden. Dieser kann sich daraufhin mit seiner RZ-Kennung und dem zugehörigen Passwort anmelden.
+    </p>
+  </div>
+
+    <div class="row well">
+      <div class="col-md-6">
+        <%= render 'form' %>
+      </div>
+      <% if @users.any? %>
+        <%= form_for("input", :url => {:controller => 'users', :action => 'update'}, method: 'patch') do |f| %>
+
+          <h3>
+            Benutzer:
+          </h3>
+            <% @users.each do |user| %>
+              <%= render "user_info2", user: user, f: f %>
+            <% end %>
+        <%= f.submit :Speichern, class:"btn btn-lg btn-primary"%>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
+
